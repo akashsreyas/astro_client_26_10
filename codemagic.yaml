@@ -1,0 +1,9 @@
+workflows:
+  hello-world:
+    name: Hello world workflow
+    scripts:
+      - name: Load Firebase configuration
+        script: |
+          #!/usr/bin/env sh
+          set -e # exit on first failed command
+          echo $IOS_FIREBASE_SECRET | base64 --decode > $CM_BUILD_DIR/ios/Runner/GoogleService-Info.plist
