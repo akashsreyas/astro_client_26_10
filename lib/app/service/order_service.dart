@@ -21,12 +21,12 @@ class OrderService {
     }
   }
 
-  Future<Order> getOrder(TimeSlot timeSlot) async {
+  Future<Order> getOrder(TimeSlot timeSlot,String room) async {
     try {
       var orderData = await FirebaseFirestore.instance
           .collection('Order')
           .where('userId', isEqualTo: UserService().getUserId())
-          .where('timeSlotId', isEqualTo: timeSlot.timeSlotId)
+          .where('timeSlotId', isEqualTo: room)
           .get();
       print('order length : ' + orderData.docs.length.toString());
       var data = orderData.docs.elementAt(0).data();
@@ -38,9 +38,9 @@ class OrderService {
     }
   }
 
-  Future confirmOrder(TimeSlot timeSlot) async {
+  Future confirmOrder(TimeSlot timeSlot, String room) async {
     try {
-      var order = await getOrder(timeSlot);
+      var order = await getOrder(timeSlot,room);
       return setOrderToComplete(order);
     } catch (e) {
       return Future.error(e.toString());

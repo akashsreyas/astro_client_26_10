@@ -36,7 +36,7 @@ var appbarTextStyle = GoogleFonts.inter(
 
 // Text Style for Doctor Category
 var doctorCategoryTextStyle = GoogleFonts.inter(
-    fontWeight: FontWeight.w700, fontSize: 15, color: mTitleColor);
+    fontWeight: FontWeight.w700, fontSize: 13, color: mTitleColor);
 
 // Text Style for Doctor Card
 var doctorNameStyle = GoogleFonts.inter(

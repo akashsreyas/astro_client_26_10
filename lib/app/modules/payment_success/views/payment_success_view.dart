@@ -53,13 +53,13 @@ class PaymentSuccessView extends GetView<PaymentSuccessController> {
               Divider(
                 height: 30,
               ),
-              Obx(() => Row(
+           Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text('TOTAL AMOUNT PAID'.tr),
-                      Text(currencySign + controller.price.value.toString())
+                      Text(currencySign + controller.room.toString())
                     ],
-                  )),
+                  ),
               Divider(
                 height: 30,
               ),

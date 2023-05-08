@@ -48,6 +48,8 @@ class AuthService {
   }
 
   Future register(String username, String email, String password) async {
+
+
     try {
       var result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);

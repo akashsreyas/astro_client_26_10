@@ -1,3 +1,8 @@
+
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -5,6 +10,9 @@ import 'package:hallo_doctor_client/app/models/doctor_model.dart';
 import 'package:hallo_doctor_client/app/models/time_slot_model.dart';
 import 'package:hallo_doctor_client/app/service/doctor_service.dart';
 import 'package:hallo_doctor_client/app/service/timeslot_service.dart';
+
+import '../../../service/user_service.dart';
+
 
 enum TimeSlotStatus { startUp, unselected, selected }
 
@@ -15,9 +23,12 @@ class ConsultationDatePickerController extends GetxController
   var selectedTimeSlot = TimeSlot().obs;
   Doctor doctor = Get.arguments[0];
   bool isReschedule = false;
+  final UserService userService = Get.find();
+  late String nav="1";
 
+  late String drstate="",drname="",draddress="",drgstno="",usstate="",usname="",usaddress="",usgstno="",uniquekey="",drstcode="",usstcode="",gsttype="";
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     if (Get.arguments[1] != null) isReschedule = true;
     print('is Reschedule ' + isReschedule.toString());
@@ -28,6 +39,36 @@ class ConsultationDatePickerController extends GetxController
     }).onError((error, stackTrace) {
       change([], status: RxStatus.error(error.toString()));
     });
+
+
+
+    var languageSettingVersionRef = await FirebaseFirestore.instance
+        .collection('Doctors')
+        .doc(doctor.doctorId)
+        .get();
+    drstate = languageSettingVersionRef.data()!['state'];
+    drname = languageSettingVersionRef.data()!['doctorName'];
+    draddress = languageSettingVersionRef.data()!['address'];
+    drgstno = languageSettingVersionRef.data()!['gstno'];
+    uniquekey = languageSettingVersionRef.data()!['uniquekey'];
+    drstcode= languageSettingVersionRef.data()!['statecode'];
+    gsttype=languageSettingVersionRef.data()!['gstType'];
+
+
+
+
+    //Getting user details
+    var languageSettingVersionRef1 = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userService.getUserId())
+        .get();
+    usname = languageSettingVersionRef1.data()!['displayName'];
+    usstate = languageSettingVersionRef1.data()!['state'];
+    usaddress = languageSettingVersionRef1.data()!['address'];
+    usgstno = languageSettingVersionRef1.data()!['gstno'];
+    usstcode = languageSettingVersionRef1.data()!['code'];
+
+
   }
 
   @override
@@ -44,8 +85,16 @@ class ConsultationDatePickerController extends GetxController
         schedule.length.toString());
     change(schedule, status: RxStatus.success());
   }
-
+void billing(){
+  Get.toNamed(
+    '/billingdetails',
+    arguments: nav,
+  );
+}
   void confirm() async {
+
+print(usname);
+
     try {
       if (isReschedule) {
         EasyLoading.show();
@@ -56,14 +105,58 @@ class ConsultationDatePickerController extends GetxController
         EasyLoading.dismiss();
         Get.back();
       } else {
-        Get.toNamed(
-          '/detail-order',
-          arguments: [selectedTimeSlot.value, doctor],
-        );
+
+        var languageSettingVersionRef = await FirebaseFirestore.instance
+            .collection('Settings')
+            .doc('withdrawSetting')
+            .get();
+        String sac = languageSettingVersionRef.data()!['sacAdvisor'];
+
+
+        //Check state is equal
+        if(drstate==usstate){
+          int cgst = languageSettingVersionRef.data()!['cgst'] as int;
+          int sgst = languageSettingVersionRef.data()!['sgst'] as int;
+
+
+
+            int totaltax=cgst+sgst;
+            int igst=0;
+
+
+              Get.toNamed(
+                '/detail-order',
+                arguments: [selectedTimeSlot.value, doctor,drname,draddress,drgstno,usname,usaddress,usgstno,cgst,sgst,igst,totaltax,uniquekey,drstate,drstcode,usstate,usstcode,sac,gsttype],
+              );
+
+
+
+
+        }else{
+
+          int igst = languageSettingVersionRef.data()!['igst'] as int;
+
+          int totaltax=igst;
+          int cgst=0,sgst=0;
+
+
+
+            Get.toNamed(
+              '/detail-order',
+              arguments: [selectedTimeSlot.value, doctor,drname,draddress,drgstno,usname,usaddress,usgstno,cgst,sgst,igst,totaltax,uniquekey,drstate,drstcode,usstate,usstcode,sac,gsttype],
+            );
+                  }
+
+
+
       }
     } catch (e) {
       EasyLoading.dismiss();
       Fluttertoast.showToast(msg: e.toString());
     }
   }
+
+
+
+
 }

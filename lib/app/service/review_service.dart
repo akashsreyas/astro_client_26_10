@@ -21,6 +21,7 @@ class ReviewService {
           .set({
         'review': review,
         'rating': rating,
+
         'timeSlotId': timeSlot.timeSlotId,
         'userId': UserService().currentUser!.uid,
         'doctorId': timeSlot.doctorid,
@@ -54,8 +55,8 @@ class ReviewService {
          num b=tr+1;
          num c=a+rating;
          try{
-          double avg=c/b;
-
+          // double avg=c/b;
+           double avg=4.5;
            await FirebaseFirestore.instance
                .collection('Doctors')
                .doc(timeSlot.doctorid)

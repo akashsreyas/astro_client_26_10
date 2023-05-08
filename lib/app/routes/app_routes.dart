@@ -32,6 +32,7 @@ abstract class Routes {
   static const CONTACT_US = _Paths.CONTACT_US;
   static const TERM_AND_CONDITION = _Paths.TERM_AND_CONDITION;
   static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
+  static const BILLING = _Paths.BILLING;
 }
 
 abstract class _Paths {
@@ -61,4 +62,6 @@ abstract class _Paths {
   static const CONTACT_US = '/contact-us';
   static const TERM_AND_CONDITION = '/term-and-condition';
   static const PRIVACY_POLICY = '/privacy-policy';
+  static const BILLING = '/billingdetails';
+
 }

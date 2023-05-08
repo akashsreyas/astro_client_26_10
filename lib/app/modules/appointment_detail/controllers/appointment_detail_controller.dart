@@ -57,6 +57,7 @@ class AppointmentDetailController extends GetxController
         await Future.delayed(const Duration(seconds: 3), () {
           videoCallStatus.value = true;
           token = event.data()!['token'];
+
           printInfo(info: 'token : ' + token);
         });
       }

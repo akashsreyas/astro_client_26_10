@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/modules/chat/views/list_users_view.dart';
@@ -12,6 +15,12 @@ import 'package:hallo_doctor_client/app/modules/profile/views/pages/update_email
 import 'package:hallo_doctor_client/app/service/auth_service.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
 import 'package:hallo_doctor_client/app/translation/en_US.dart';
+
+import '../views/pages/billingdetails.dart';
+import '../views/pages/invoice.dart';
+
+import 'package:intl/intl.dart';
+
 
 class ProfileController extends GetxController {
   //TODO: Implement ProfileController
@@ -24,7 +33,9 @@ class ProfileController extends GetxController {
   var appVersion = ''.obs;
   var email = ''.obs;
   var newPassword = ''.obs;
-
+  var formkey = GlobalKey<FormState>();
+  var userids=UserService().currentUser!.uid;
+  late String v="1";
   @override
   void onInit() async {
     super.onInit();
@@ -37,6 +48,7 @@ class ProfileController extends GetxController {
     super.onReady();
     var user = userService.currentUser;
     print('user : ' + user.toString());
+
     profilePic.value = userService.getProfilePicture()!;
     username.value = user!.displayName!;
     email.value = user.email!;
@@ -71,7 +83,17 @@ class ProfileController extends GetxController {
   toChangePassword() {
     Get.to(() => ChangePasswordPage());
   }
+  toBilling() {
+    Get.to(() => Billing_Details());
+  }
 
+  toInvoice() async {
+
+
+
+
+    Get.to(() => InvoiceListScreen());
+  }
   void updateProfilePic(File filePath) {
     EasyLoading.show(maskType: EasyLoadingMaskType.black);
     userService.updateProfilePic(filePath).then((updatedUrl) {
@@ -155,4 +177,32 @@ class ProfileController extends GetxController {
       return Future.error(e);
     }
   }
+
+  void addDataWithId(String _selectedValue,String state,String statecode,String gstno,String address) async {
+    var user =UserService().currentUser!.uid;
+    try {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user)
+          .update({
+        'country': _selectedValue,
+        'state': state,
+        'code': statecode,
+        'gstno':gstno,
+        'address':address,
+      });
+      print('Data updated successfully!');
+      Fluttertoast.showToast(msg: 'Data updated successfully!'.tr);
+    } catch (error) {
+      print('Failed to update data: $error');
+    }
+  }
+
+  void billing(){
+    Get.toNamed(
+      '/consultation-date-picker',
+      arguments: [],
+    );
+  }
+
 }

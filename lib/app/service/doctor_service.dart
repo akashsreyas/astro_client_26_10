@@ -51,7 +51,7 @@ class DoctorService {
           .collection('Doctors')
           .where('doctorCategory.categoryId',
               isEqualTo: doctorCategory.categoryId)
-          .where('accountStatus', isEqualTo: 'active')
+          .where('accountStatus', isEqualTo: 'active').orderBy('totalRatingCount', descending: true)
           .get();
 
       if (listDoctorQuery.docs.isEmpty) return [];

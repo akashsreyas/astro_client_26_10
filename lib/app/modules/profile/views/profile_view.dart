@@ -66,6 +66,20 @@ class ProfileView extends GetView<ProfileController> {
                         controller.toChangePassword();
                       },
                     ),
+                    ProfileButton(
+                      icon:  Icons.person,
+                      text: 'Billing Details'.tr,
+                      onTap: () {
+                        controller.toBilling();
+                      },
+                    ),
+                    ProfileButton(
+                      icon:  Icons.person,
+                      text: 'Invoice'.tr,
+                      onTap: () {
+                        controller.toInvoice();
+                      },
+                    ),
                     SizedBox(
                       height: 20,
                     ),
@@ -79,14 +93,14 @@ class ProfileView extends GetView<ProfileController> {
                       ),
                     ),
                     //uncomment if you wanto test something
-                    // TextButton(
-                    //   onPressed: () {
-                    //     //controller.testButton();
-                    //     //LocalizationService().changeLocale('France');
-                    //     Get.toNamed('/faq');
-                    //   },
-                    //   child: Text('FAQ'),
-                    // ),
+                    TextButton(
+                      onPressed: () {
+                        //controller.testButton();
+                        //LocalizationService().changeLocale('France');
+                        Get.toNamed('/faq');
+                      },
+                      child: Text('FAQ'),
+                    ),
                     TextButton(
                       onPressed: () {
                         // controller.testButton();

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:hallo_doctor_client/app/service/videocall_service.dart';
 import 'package:hallo_doctor_client/app/utils/environment.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
+
 
 class VideoCallController extends GetxController {
   TimeSlot timeSlot = Get.arguments[0]['timeSlot'];
@@ -19,6 +21,10 @@ class VideoCallController extends GetxController {
   int? remoteUid;
   // Instantiate the client
   late RtcEngine engine;
+
+  Object? get userInfo => null;
+
+
   @override
   void onInit() {
     super.onInit();
@@ -37,8 +43,22 @@ class VideoCallController extends GetxController {
   }
 
   completedConsultation() async {
+
+
     if (videoCallEstablished) {
-      Get.offNamed(Routes.CONSULTATION_CONFIRM, arguments: timeSlot);
+     // Get.offNamed(Routes.CONSULTATION_CONFIRM, arguments: timeSlot);
+
+      Get.toNamed(Routes.CONSULTATION_CONFIRM, arguments: [
+        {
+          'timeSlot': timeSlot,
+          'room': room,
+          'token': token
+
+        }
+      ]);
+
+
+
       // Get.offNamedUntil(
       //     '/consultation-confirm', ModalRoute.withName('/appointment-detail'),
       //     arguments: timeSlot);
@@ -54,24 +74,30 @@ class VideoCallController extends GetxController {
 
     //create the engine
     engine = await RtcEngine.create(Environment.agoraAppId);
+
     await engine.enableVideo();
     engine.setEventHandler(
       RtcEngineEventHandler(
-        joinChannelSuccess: (String channel, int uid, int elapsed) {
+        joinChannelSuccess: (String channel, int uid, int elapsed) async {
           print("local user $uid joined");
           localUserJoined = true;
           videoCallEstablished = true;
+
           update();
+
         },
-        userJoined: (int uid, int elapsed) {
+
+        userJoined: (int uid, int elapsed) async {
           print("remote user $uid joined");
 
           remoteUid = uid;
           update();
         },
-        userOffline: (int uid, UserOfflineReason reason) {
+        userOffline: (int uid, UserOfflineReason reason) async {
           print("remote user $uid left channel");
           remoteUid = null;
+
+          print(userInfo);
           completedConsultation();
           update();
         },
@@ -90,6 +116,7 @@ class VideoCallController extends GetxController {
     await VideoCallService().removeRoom(room);
     await engine.leaveChannel();
     await engine.destroy();
+
   }
 
   Future switchCamera() async {
@@ -109,4 +136,6 @@ class VideoCallController extends GetxController {
       Fluttertoast.showToast(msg: e.toString());
     }
   }
+
+
 }

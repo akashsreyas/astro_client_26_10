@@ -40,7 +40,9 @@ class DoctorCategoryView extends GetView<DoctorCategoryController> {
                             arguments: listCategory[index]);
                       },
                       child: Container(
+
                           child: Column(
+
                         children: [
                           Expanded(
                               child: Container(
@@ -55,10 +57,13 @@ class DoctorCategoryView extends GetView<DoctorCategoryController> {
                           SizedBox(
                             height: 5,
                           ),
-                          FittedBox(
-                            fit: BoxFit.fitWidth,
+
+                          Flexible(
+
                             child: Text(
+                              textAlign: TextAlign.center,
                               listCategory[index].categoryName!,
+                              overflow: TextOverflow.visible,
                               style: doctorCategoryTextStyle,
                             ),
                           ),

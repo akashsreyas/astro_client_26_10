@@ -61,6 +61,10 @@ dependencies:
   webview_flutter_plus: ^0.3.0+2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  csv: ^5.0.1
+  flutter_cupertino_date_picker: ^1.0.5
+  share: ^2.0.4
+
 
 dev_dependencies:
   flutter_lints: ^2.0.0

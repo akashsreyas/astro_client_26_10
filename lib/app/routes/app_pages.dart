@@ -37,6 +37,7 @@ import '../modules/payment_success/views/payment_success_view.dart';
 import '../modules/privacy_policy/bindings/privacy_policy_binding.dart';
 import '../modules/privacy_policy/views/privacy_policy_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
+import '../modules/profile/views/pages/billingdetails.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/register/bindings/register_binding.dart';
 import '../modules/register/views/register_view.dart';
@@ -62,6 +63,8 @@ class AppPages {
 
   static const DASHBOARD = Routes.DASHBOARD;
   static const LOGIN = Routes.LOGIN;
+
+
 
   static final routes = [
     GetPage(
@@ -193,6 +196,11 @@ class AppPages {
       name: _Paths.PRIVACY_POLICY,
       page: () => const Privacy_Policy_View(),
       binding: privacy_policy_binding(),
+    ),
+    GetPage(
+      name: _Paths.BILLING,
+      page: () => Billing_Details(),
+
     ),
   ];
 }

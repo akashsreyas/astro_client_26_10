@@ -50,6 +50,7 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
                     SizedBox(
                       height: 10,
                     ),
+
                     TextButton(
                       onPressed: () {
                         controller.problemVisible.value =
@@ -57,6 +58,20 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
                       },
                       child: Text('No, there is a problem'.tr),
                     ),
+                    TextButton(
+
+                      onPressed: () {
+
+                      },
+                      child: Text('we love to hear from you and write to us'.tr),
+
+                    ),TextButton(
+                      onPressed: () {
+
+                      },
+                      child: Text('admin@bizboozt.co.in'.tr),
+                    ),
+
                     Visibility(
                       visible: controller.problemVisible.value,
                       child: Container(
@@ -115,12 +130,15 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
                                   },
                                   child: Text('Send'),
                                 ),
-                              )
+                              ),
+
                             ],
                           ),
                         ),
                       ),
                     ),
+
+
                   ],
                 )),
           ),

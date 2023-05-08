@@ -35,6 +35,7 @@ void main() async {
       debugShowCheckedModeBanner: false,
       title: "Application",
       initialRoute: isUserLogin ? AppPages.DASHBOARD : AppPages.LOGIN,
+
       getPages: AppPages.routes,
       builder: EasyLoading.init(),
       localizationsDelegates: [

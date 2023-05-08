@@ -6,10 +6,18 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hallo_doctor_client/app/utils/constants/style_constants.dart';
 import 'package:intl/intl.dart';
+import '../../../routes/app_pages.dart';
+import '../../detail_order/views/detail_order_view.dart';
+import '../../profile/views/pages/billingdetails.dart';
 import '../controllers/consultation_date_picker_controller.dart';
 
 class ConsultationDatePickerView
     extends GetView<ConsultationDatePickerController> {
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,11 +138,22 @@ class ConsultationDatePickerView
             alignment: Alignment.bottomCenter,
             child: InkWell(
               onTap: () {
+
                 if (controller.selectedTimeSlot.value.timeSlotId == null) {
                   Fluttertoast.showToast(msg: 'Please select time slot'.tr);
-                } else {
+                  }
+                else if (controller.usaddress.isEmpty||controller.usstate.isEmpty){
+                  Fluttertoast.showToast(msg: 'Please Add Billing Details'.tr);
+                  controller.billing();
+                }else{
                   controller.confirm();
                 }
+
+
+
+
+
+
               },
               child: Container(
                 height: 50,
@@ -154,4 +173,26 @@ class ConsultationDatePickerView
       ),
     );
   }
+
+  void showAlertDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            child: Text("OK"),
+            onPressed: () {
+
+
+              Navigator.pop(context);// close the dialog
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+

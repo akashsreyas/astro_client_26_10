@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:get/get.dart';
+import 'package:hallo_doctor_client/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:hallo_doctor_client/app/modules/dashboard/views/dashboard_view.dart';
 import 'package:hallo_doctor_client/app/modules/widgets/submit_button.dart';
 
+import '../../../routes/app_pages.dart';
 import '../controllers/review_controller.dart';
 
 class ReviewView extends GetView<ReviewController> {
@@ -72,7 +75,8 @@ class ReviewView extends GetView<ReviewController> {
                       onTap: () {
                         print("current index ${_currentindex}");
                         controller.saveReiew(_currentindex);
-
+                        Navigator.of(context)
+                            .pushNamedAndRemoveUntil(Routes.DASHBOARD, (Route<dynamic> route) => false);
 
 
 

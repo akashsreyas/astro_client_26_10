@@ -13,6 +13,8 @@ enum ChosePayment { addCard, creditCard }
 
 class DetailOrderView extends GetView<DetailOrderController> {
   final String assetName = 'assets/icons/powered-by-stripe.svg';
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +47,7 @@ class DetailOrderView extends GetView<DetailOrderController> {
                       height: 10,
                     ),
                     Container(
-                      height: 200,
+                      height: 500,
                       width: double.infinity,
                       padding: EdgeInsets.all(5),
                       child: Column(
@@ -56,21 +58,178 @@ class DetailOrderView extends GetView<DetailOrderController> {
                           ),
                           Container(
                             width: double.infinity,
-                            height: 20,
+                            height: 25,
                             alignment: Alignment.centerRight,
                             padding: EdgeInsets.only(right: 30),
                             child: Text(
-                              'Total : '.tr +
+                              'Amount : '.tr +
                                   currencySign +
                                   controller.selectedTimeSlot.price.toString(),
                               style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 17,
+                                  fontSize: 10,
                                   color: mTitleColor),
                             ),
-                          )
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'CGST : '.tr +
+                                  currencySign +
+                                  ((controller.selectedTimeSlot.price! * controller.cgst)/100).toStringAsFixed(2),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'SGST : '.tr +
+                                  currencySign +
+                                  ((controller.selectedTimeSlot.price! * controller.sgst)/100).toStringAsFixed(2),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'IGST : '.tr +
+                                  currencySign +
+                                  ((controller.selectedTimeSlot.price! * controller.igst)/100).toStringAsFixed(2),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'Total Tax Amount : '.tr +
+                                  currencySign +
+                                  ((controller.selectedTimeSlot.price! * controller.totaltax)/100).toStringAsFixed(2),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'Total Amount : '.tr +
+                                  currencySign +
+                                  (((controller.selectedTimeSlot.price! * controller.totaltax)/100)+controller.selectedTimeSlot.price!).toStringAsFixed(2),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'Billing Details ',
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.topLeft,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'Billing Address : '.tr +
+                                  controller.usaddress.toString(),
+                                  style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: mTitleColor),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+
+                            width: double.infinity,
+                            height: 25,
+                            alignment: Alignment.topLeft,
+                            padding: EdgeInsets.only(right: 30),
+
+                            child: Text(
+                              'GST No : '.tr +
+                                  controller.usgstno.toString(),
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: mTitleColor),
+                            ),
+                          ),
                         ],
                       ),
+
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.all(
@@ -81,6 +240,7 @@ class DetailOrderView extends GetView<DetailOrderController> {
                     SizedBox(
                       height: 20,
                     ),
+
                     InkWell(
                       onTap: () {
                         // Get.defaultDialog(
@@ -96,6 +256,7 @@ class DetailOrderView extends GetView<DetailOrderController> {
                         //
                         controller.payWithRazorpay();
                       },
+
                       child: Container(
                         height: 50,
                         alignment: Alignment.center,
