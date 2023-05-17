@@ -84,7 +84,11 @@ class ProfileController extends GetxController {
     Get.to(() => ChangePasswordPage());
   }
   toBilling() {
-    Get.to(() => Billing_Details());
+    Get.toNamed(
+      '/billingdetails',
+      arguments: '0',
+    );
+   // Get.to(() => Billing_Details());
   }
 
   toInvoice() async {
@@ -192,6 +196,8 @@ class ProfileController extends GetxController {
         'address':address,
       });
       print('Data updated successfully!');
+    notifyChildrens();
+
       Fluttertoast.showToast(msg: 'Data updated successfully!'.tr);
     } catch (error) {
       print('Failed to update data: $error');
@@ -200,7 +206,14 @@ class ProfileController extends GetxController {
 
   void billing(){
     Get.toNamed(
-      '/consultation-date-picker',
+      '/detail-doctor',
+      arguments: [],
+    );
+  }
+
+  void profile(){
+    Get.toNamed(
+      '/profile',
       arguments: [],
     );
   }

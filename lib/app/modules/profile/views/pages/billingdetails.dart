@@ -235,6 +235,9 @@ class Billing_Details extends GetView<ProfileController> {
                               if(token=="1"){
                                 controller.billing();
                               }
+                              else{
+                                controller.profile();
+                              }
 
                             },
                             text: 'Save'.tr),

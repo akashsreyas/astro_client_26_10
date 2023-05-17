@@ -22,6 +22,7 @@ class OrderService {
   }
 
   Future<Order> getOrder(TimeSlot timeSlot,String room) async {
+
     try {
       var orderData = await FirebaseFirestore.instance
           .collection('Order')
@@ -32,6 +33,7 @@ class OrderService {
       var data = orderData.docs.elementAt(0).data();
       data['orderId'] = orderData.docs.elementAt(0).reference.id;
       Order order = Order.fromMap(data);
+
       return order;
     } on Exception catch (e) {
       return Future.error(e.toString());
@@ -39,8 +41,11 @@ class OrderService {
   }
 
   Future confirmOrder(TimeSlot timeSlot, String room) async {
+
+
     try {
       var order = await getOrder(timeSlot,room);
+
       return setOrderToComplete(order);
     } catch (e) {
       return Future.error(e.toString());
@@ -48,6 +53,7 @@ class OrderService {
   }
 
   Future<void> setOrderToComplete(Order order) async {
+
     await FirebaseFirestore.instance
         .collection("Order")
         .doc(order.orderId)

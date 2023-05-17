@@ -4,7 +4,7 @@ class Order {
   String? orderId;
   String? status;
   String? currency;
-  int? amount;
+  num? amount;
   String? timeSlotId;
   static const String _orderId = 'orderId';
   static const String _status = 'status';

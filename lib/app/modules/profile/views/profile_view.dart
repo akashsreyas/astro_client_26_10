@@ -21,7 +21,8 @@ class ProfileView extends GetView<ProfileController> {
         ),
         centerTitle: true,
       ),
-      body: Stack(children: [
+      body: SingleChildScrollView(
+    child:Stack(children: [
         CustomPaint(
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -41,7 +42,7 @@ class ProfileView extends GetView<ProfileController> {
                     },
                   )),
               Card(
-                margin: EdgeInsets.only(top: 50, left: 20, right: 20),
+                margin: EdgeInsets.only(top: 40, left: 20, right: 20),
                 elevation: 3,
                 child: Column(
                   children: [
@@ -81,7 +82,7 @@ class ProfileView extends GetView<ProfileController> {
                       },
                     ),
                     SizedBox(
-                      height: 20,
+                      height: 10,
                     ),
                     Container(
                       width: double.infinity,
@@ -92,6 +93,7 @@ class ProfileView extends GetView<ProfileController> {
                         child: Text('Logout'.tr),
                       ),
                     ),
+
                     //uncomment if you wanto test something
                     TextButton(
                       onPressed: () {
@@ -122,7 +124,7 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ),
               SizedBox(
-                height: 30,
+                height: 20,
               ),
               // Expanded(
               //   child: Center(
@@ -134,7 +136,7 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ),
       ]),
-    );
+    ),);
   }
 
   // Widget builds the display item with the proper formatting to display the user's info

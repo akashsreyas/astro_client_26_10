@@ -11,14 +11,24 @@ import '../../detail_order/views/detail_order_view.dart';
 import '../../profile/views/pages/billingdetails.dart';
 import '../controllers/consultation_date_picker_controller.dart';
 
-class ConsultationDatePickerView
-    extends GetView<ConsultationDatePickerController> {
+class ConsultationDatePickerView extends StatefulWidget {
+
+  _MyPageState createState() => _MyPageState();
 
 
-
-
+}
+class _MyPageState extends State<ConsultationDatePickerView> {
+  @override
+  final ConsultationDatePickerController _consultationController = Get.put(
+      ConsultationDatePickerController());
 
   @override
+  void initState() {
+    super.initState();
+    _consultationController.onInit();
+  }
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +58,7 @@ class ConsultationDatePickerView
               daysCount: 10,
               selectionColor: secondaryColor,
               onDateChange: (date) {
-                controller.updateScheduleAtDate(
+                _consultationController.updateScheduleAtDate(
                     date.day, date.month, date.year);
               },
             ),
@@ -67,7 +77,7 @@ class ConsultationDatePickerView
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: controller.obx(
+              child: _consultationController.obx(
                 (timeSlot) => GridView.builder(
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: 200,
@@ -83,9 +93,41 @@ class ConsultationDatePickerView
                         .add(Duration(minutes: timeSlot[index].duration!));
                     var timeEndFormat = DateFormat("hh:mm a").format(timeEnd);
                     if (timeSlot[index].available!) {
+
+                      if(timeSlot[index].booking=='Closed'){
+                        return InkWell(
+                          onTap: () {
+                            _consultationController.selectedTimeSlot.value = timeSlot[index];
+                          },
+                          child: Obx(
+                                () => Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                timeStartFormat +
+                                    ' - ' +
+                                    timeEndFormat +
+                                    '\n Under Processing'.tr,
+                                textAlign: TextAlign.center,
+                              ),
+                              decoration: (_consultationController.selectedTimeSlot.value ==
+                                  timeSlot[index])
+                                  ? BoxDecoration(
+                                color: Colors.red[100],
+                                border: Border.all(
+                                    color: Colors.deepOrange, width: 5),
+                                borderRadius: BorderRadius.circular(15),
+                              )
+                                  : BoxDecoration(
+                                color: Colors.deepOrange[400],
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
                       return InkWell(
                         onTap: () {
-                          controller.selectedTimeSlot.value = timeSlot[index];
+                          _consultationController.selectedTimeSlot.value = timeSlot[index];
                         },
                         child: Obx(
                           () => Container(
@@ -97,7 +139,7 @@ class ConsultationDatePickerView
                                   '\n Available'.tr,
                               textAlign: TextAlign.center,
                             ),
-                            decoration: (controller.selectedTimeSlot.value ==
+                            decoration: (_consultationController.selectedTimeSlot.value ==
                                     timeSlot[index])
                                 ? BoxDecoration(
                                     color: Colors.green[100],
@@ -138,15 +180,16 @@ class ConsultationDatePickerView
             alignment: Alignment.bottomCenter,
             child: InkWell(
               onTap: () {
-
-                if (controller.selectedTimeSlot.value.timeSlotId == null) {
+                // _consultationController.onInit();
+                if (_consultationController.selectedTimeSlot.value.timeSlotId == null) {
                   Fluttertoast.showToast(msg: 'Please select time slot'.tr);
                   }
-                else if (controller.usaddress.isEmpty||controller.usstate.isEmpty){
+                else if (_consultationController.usaddress.isEmpty||_consultationController.usstate.isEmpty){
                   Fluttertoast.showToast(msg: 'Please Add Billing Details'.tr);
-                  controller.billing();
-                }else{
-                  controller.confirm();
+                  _consultationController.billing();
+                }
+                else{
+                  _consultationController.confirm();
                 }
 
 

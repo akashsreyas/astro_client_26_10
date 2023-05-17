@@ -12,7 +12,7 @@ import '../../../routes/app_pages.dart';
 import '../controllers/review_controller.dart';
 
 class ReviewView extends GetView<ReviewController> {
-  double _currentindex=0;
+  double _currentindex=5;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -65,7 +65,9 @@ class ReviewView extends GetView<ReviewController> {
                           // print(rating);
 
                           _currentindex=rating;
+                          print("ggggggggg");
                           print(rating);
+                          print(_currentindex);
                         },
                       )),
                   SizedBox(

@@ -47,7 +47,7 @@ class VideoCallController extends GetxController {
 
     if (videoCallEstablished) {
      // Get.offNamed(Routes.CONSULTATION_CONFIRM, arguments: timeSlot);
-
+      Get.close(1);
       Get.toNamed(Routes.CONSULTATION_CONFIRM, arguments: [
         {
           'timeSlot': timeSlot,

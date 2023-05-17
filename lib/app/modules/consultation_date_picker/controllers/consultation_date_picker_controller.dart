@@ -26,12 +26,16 @@ class ConsultationDatePickerController extends GetxController
   final UserService userService = Get.find();
   late String nav="1";
 
-  late String drstate="",drname="",draddress="",drgstno="",usstate="",usname="",usaddress="",usgstno="",uniquekey="",drstcode="",usstcode="",gsttype="";
+
+
+  late String drstate="",drname="",draddress="",drgstno="",usstate="",usname="",usaddress="",usgstno="",uniquekey="",drstcode="",usstcode="",gsttype="",timeslotbooking="",bookeduser="";
   @override
   Future<void> onInit() async {
+
+
     super.onInit();
     if (Get.arguments[1] != null) isReschedule = true;
-    print('is Reschedule ' + isReschedule.toString());
+    print('is Reschedule $isReschedule');
     DoctorService().getDoctorTimeSlot(doctor).then((timeSlot) {
       allTimeSlot = timeSlot;
       updateScheduleAtDate(
@@ -86,6 +90,7 @@ class ConsultationDatePickerController extends GetxController
     change(schedule, status: RxStatus.success());
   }
 void billing(){
+
   Get.toNamed(
     '/billingdetails',
     arguments: nav,
@@ -93,7 +98,32 @@ void billing(){
 }
   void confirm() async {
 
-print(usname);
+    String user=userService.getUserId();
+
+    var booking = await FirebaseFirestore.instance
+        .collection('DoctorTimeslot')
+        .doc(selectedTimeSlot.value.timeSlotId)
+        .get();
+    timeslotbooking = booking.data()!['booking'];
+    bookeduser = booking.data()!['bookeduser'];
+
+
+    if(timeslotbooking=="Open"){
+
+      try {
+
+        await FirebaseFirestore.instance
+            .collection('DoctorTimeslot')
+            .doc(selectedTimeSlot.value.timeSlotId)
+            .update({'booking': 'Closed','bookeduser':userService.getUserId()});
+
+      } catch (e) {
+        return Future.error(e.toString());
+      }
+
+
+
+
 
     try {
       if (isReschedule) {
@@ -153,6 +183,72 @@ print(usname);
     } catch (e) {
       EasyLoading.dismiss();
       Fluttertoast.showToast(msg: e.toString());
+    }
+    }else if(timeslotbooking=="Closed" && user==bookeduser){
+      try {
+        if (isReschedule) {
+          EasyLoading.show();
+          await TimeSlotService()
+              .rescheduleTimeslot(Get.arguments[1], selectedTimeSlot.value);
+          Fluttertoast.showToast(
+              msg: 'Appointment has been successfully rescheduled'.tr);
+          EasyLoading.dismiss();
+          Get.back();
+        } else {
+
+          var languageSettingVersionRef = await FirebaseFirestore.instance
+              .collection('Settings')
+              .doc('withdrawSetting')
+              .get();
+          String sac = languageSettingVersionRef.data()!['sacAdvisor'];
+
+
+          //Check state is equal
+          if(drstate==usstate){
+            int cgst = languageSettingVersionRef.data()!['cgst'] as int;
+            int sgst = languageSettingVersionRef.data()!['sgst'] as int;
+
+
+
+            int totaltax=cgst+sgst;
+            int igst=0;
+
+
+            Get.toNamed(
+              '/detail-order',
+              arguments: [selectedTimeSlot.value, doctor,drname,draddress,drgstno,usname,usaddress,usgstno,cgst,sgst,igst,totaltax,uniquekey,drstate,drstcode,usstate,usstcode,sac,gsttype],
+            );
+
+
+
+
+          }else{
+
+            int igst = languageSettingVersionRef.data()!['igst'] as int;
+
+            int totaltax=igst;
+            int cgst=0,sgst=0;
+
+
+
+            Get.toNamed(
+              '/detail-order',
+              arguments: [selectedTimeSlot.value, doctor,drname,draddress,drgstno,usname,usaddress,usgstno,cgst,sgst,igst,totaltax,uniquekey,drstate,drstcode,usstate,usstcode,sac,gsttype],
+            );
+          }
+
+
+
+        }
+      } catch (e) {
+        EasyLoading.dismiss();
+        Fluttertoast.showToast(msg: e.toString());
+      }
+    }
+    else{
+
+      Fluttertoast.showToast(msg: 'Timeslot under process by another user may open after sometime'.tr);
+      print('closed');
     }
   }
 

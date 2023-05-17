@@ -47,7 +47,8 @@ class ConsultationConfirmController extends GetxController {
     try {
       EasyLoading.show();
 
-      await OrderService().confirmOrder(timeSlot,room);
+
+     await OrderService().confirmOrder(timeSlot,room);
       invoice(room);
       EasyLoading.dismiss();
       Get.offNamed(Routes.REVIEW, arguments: timeSlot);

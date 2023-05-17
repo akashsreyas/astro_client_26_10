@@ -69,6 +69,7 @@ class TimeSlot {
       this.doctor,
       this.purchaseTime,
       this.callststus,
+      this.booking,
       this.status});
   String? id;
   @JsonKey(name: 'timeSlotId')
@@ -86,6 +87,8 @@ class TimeSlot {
   String? doctorid;
   @JsonKey(name: 'callststus')
   String? callststus;
+  @JsonKey(name: 'booking')
+  String? booking;
 
   @JsonKey(name: 'doctor', toJson: doctorToJson)
   Doctor? doctor;
