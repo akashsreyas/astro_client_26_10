@@ -10,7 +10,7 @@ class PaymentSuccessController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final count = 0.obs;
   late AnimationController animController;
-  // TimeSlot timeSlot = Get.arguments;
+
 
   TimeSlot timeSlot = Get.arguments[0]['timeSlot'];
   double room = Get.arguments[0]['room'];

@@ -53,10 +53,14 @@ class DoctorCard extends StatelessWidget {
                           style: doctorNameTextStyle,
                         ),
                       ),
-                      Text(
-                        doctorSpecialty!,
-                        style: specialistTextStyle,
-                      ),
+
+          Text(
+            doctorSpecialty!.split("-").join("\n"),
+            style: specialistTextStyle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+
+          ),
                       RatingBarIndicator(
                           rating: rating!.toDouble(),
                           itemCount: 5,
@@ -79,8 +83,9 @@ class DoctorCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8)),
                           child: Text(
                             "Book Appointment".tr,
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white,fontSize: 12),
                             textAlign: TextAlign.center,
+
                           ),
                         )),
                   )

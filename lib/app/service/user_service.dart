@@ -22,7 +22,15 @@ class UserService {
   }
 
   Future<String> getUsername() async {
+    print(currentUser!.displayName!);
     return currentUser!.displayName!;
+  }
+  String geUser()  {
+
+    return currentUser!.displayName!;
+  }
+  String getEmail()  {
+    return currentUser!.email!;
   }
 
   String? getProfilePicture() {

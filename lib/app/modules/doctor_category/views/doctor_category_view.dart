@@ -7,6 +7,7 @@ import 'package:hallo_doctor_client/app/utils/constants/style_constants.dart';
 import '../controllers/doctor_category_controller.dart';
 
 class DoctorCategoryView extends GetView<DoctorCategoryController> {
+  final RxInt selectedCategoryIndex = 0.obs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +15,7 @@ class DoctorCategoryView extends GetView<DoctorCategoryController> {
         backgroundColor: mBackgroundColor,
         elevation: 0,
         title: Text(
-          'Doctor Specialist'.tr,
+          'Advisor Specialist'.tr,
           style: TextStyle(color: mTitleColor),
         ),
         centerTitle: true,
@@ -36,42 +37,43 @@ class DoctorCategoryView extends GetView<DoctorCategoryController> {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {
+                        selectedCategoryIndex.value = index;
                         Get.toNamed('/list-doctor',
                             arguments: listCategory[index]);
                       },
-                      child: Container(
-
+                      child: Obx(() {
+                        bool isSelected = selectedCategoryIndex.value == index;
+                        return Container(
                           child: Column(
-
-                        children: [
-                          Expanded(
-                              child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                color: Colors.blue[200]),
-                            padding: const EdgeInsets.all(8.0),
-                            child: CachedNetworkImage(
-                                imageUrl: listCategory[index].iconUrl!),
-                          )),
-                          SizedBox(
-                            height: 5,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    color: isSelected ? Colors.red[200] : Colors.blue[200],
+                                  ),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: CachedNetworkImage(imageUrl: listCategory[index].iconUrl!),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  listCategory[index].categoryName!,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.visible,
+                                  style: doctorCategoryTextStyle,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 3,
+                              )
+                            ],
                           ),
-
-                          Flexible(
-
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              listCategory[index].categoryName!,
-                              overflow: TextOverflow.visible,
-                              style: doctorCategoryTextStyle,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 3,
-                          )
-                        ],
-                      )),
+                        );
+                      }),
                     );
                   })),
             ),

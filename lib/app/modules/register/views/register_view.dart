@@ -49,8 +49,8 @@ class RegisterView extends GetView<RegisterController> {
                           node.nextFocus();
                         },
                         validator: ((value) {
-                          if (value!.length < 6) {
-                            return 'Name must be  6 or more characters'.tr;
+                          if (value!.length < 3) {
+                            return 'Name must be  3 or more characters'.tr;
                           } else {
                             return null;
                           }
@@ -105,8 +105,8 @@ class RegisterView extends GetView<RegisterController> {
                                   node.nextFocus();
                                 },
                                 validator: ((value) {
-                                  if (value!.length < 3) {
-                                    return 'Password must be more thand four characters'
+                                  if (value!.length < 6) {
+                                    return 'Password must be more than 6 characters'
                                         .tr;
                                   } else {
                                     return null;
@@ -190,16 +190,16 @@ class RegisterView extends GetView<RegisterController> {
                           text: 'Register Now'.tr),
                       SizedBox(height: height * .01),
                       DividerOr(),
-                      Container(
-                        width: Get.width,
-                        height: 50,
-                        child: SignInButton(
-                          Buttons.Google,
-                          onPressed: () {
-                            controller.loginGoogle();
-                          },
-                        ),
-                      ),
+                      // Container(
+                      //   width: Get.width,
+                      //   height: 50,
+                      //   child: SignInButton(
+                      //     Buttons.Google,
+                      //     onPressed: () {
+                      //       controller.loginGoogle();
+                      //     },
+                      //   ),
+                      // ),
                       LabelButton(
                         onTap: () {
                           Get.offAndToNamed("/login");

@@ -7,6 +7,7 @@ import 'package:hallo_doctor_client/app/service/notification_service.dart';
 import 'package:hallo_doctor_client/app/service/timeslot_service.dart';
 import 'package:hallo_doctor_client/app/service/auth_service.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
+import 'package:hallo_doctor_client/app/service/videocall_service.dart';
 
 import '../controllers/dashboard_controller.dart';
 
@@ -20,6 +21,7 @@ class DashboardBinding extends Bindings {
     Get.lazyPut<NotificationService>(
       () => NotificationService(),
     );
+
     Get.lazyPut<UserService>(() => UserService());
     Get.put(HomeController());
     Get.lazyPut<ProfileController>(() => ProfileController());

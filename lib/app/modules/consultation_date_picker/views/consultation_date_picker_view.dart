@@ -21,18 +21,24 @@ class _MyPageState extends State<ConsultationDatePickerView> {
   @override
   final ConsultationDatePickerController _consultationController = Get.put(
       ConsultationDatePickerController());
+  late bool isExpired;
+  late bool isExpiredcheck;
+  late bool isadvExpired;
+  late bool isadvExpiredcheck;
 
+  late int advhour=0,advminute=0;
   @override
   void initState() {
     super.initState();
     _consultationController.onInit();
-  }
+
+ }
 
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chose Timeslot'.tr),
+        title: Text('Choose Timeslot'.tr),
         centerTitle: true,
       ),
       body: Container(
@@ -41,7 +47,7 @@ class _MyPageState extends State<ConsultationDatePickerView> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Chose Date'.tr,
+              'Choose Date'.tr,
               style: titleTextStyle,
             ),
           ),
@@ -49,13 +55,14 @@ class _MyPageState extends State<ConsultationDatePickerView> {
             height: 10,
           ),
           Container(
+            height: 90,
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: DatePicker(
               DateTime.now(),
               initialSelectedDate: DateTime.now(),
-              daysCount: 10,
+              daysCount: 30,
               selectionColor: secondaryColor,
               onDateChange: (date) {
                 _consultationController.updateScheduleAtDate(
@@ -67,7 +74,7 @@ class _MyPageState extends State<ConsultationDatePickerView> {
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Chose Time'.tr,
+              'Choose Time'.tr,
               style: titleTextStyle,
             ),
           ),
@@ -91,77 +98,220 @@ class _MyPageState extends State<ConsultationDatePickerView> {
                     var timeEnd = timeSlot[index]
                         .timeSlot!
                         .add(Duration(minutes: timeSlot[index].duration!));
-                    var timeEndFormat = DateFormat("hh:mm a").format(timeEnd);
-                    if (timeSlot[index].available!) {
 
-                      if(timeSlot[index].booking=='Closed'){
+                    var timeEndFormat = DateFormat("hh:mm a").format(timeEnd);
+                    var amt=  timeSlot[index].price!;
+
+
+
+
+                    if (timeSlot[index].available!) {
+                      // if(timeSlot[index].booking=='Closed'){
+                      //   DateTime currentTime = DateTime.now();
+                      //
+                      //   // Get the start and end times of the slot
+                      //   DateTime startTime = timeSlot[index].timeSlot!;
+                      //   DateTime endTime = startTime.add(Duration(minutes: timeSlot[index].duration!));
+                      //
+                      //   // Check if the slot is expired (past the current time)
+                      //   isExpired = currentTime.isAfter(endTime);
+                      //
+                      //
+                      //   // advhour =2;
+                      //   // advminute=15;
+                      //   DateTime advendTime = currentTime.add(Duration(hours: 2,minutes: 15));
+                      //   isadvExpired = startTime.isBefore(advendTime);
+                      //
+                      //   return InkWell(
+                      //     onTap: () {
+                      //       _consultationController.selectedTimeSlot.value = timeSlot[index];
+                      //     },
+                      //     child: Obx(
+                      //           () => Container(
+                      //         alignment: Alignment.center,
+                      //             child:
+                      //             // Text(
+                      //             //   isExpired ? '$timeStartFormat - $timeEndFormat\n${amt!}Expired' : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Under Processing'.tr}',
+                      //             //   textAlign: TextAlign.center,
+                      //             // ),
+                      //             Text(
+                      //               isExpired
+                      //                   ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired'
+                      //                   : isadvExpired
+                      //                   ? '$timeStartFormat - $timeEndFormat\n${amt!}\nAdvanced Expired'
+                      //                   : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Under Processing'.tr}'
+                      //               ,
+                      //               textAlign: TextAlign.center,
+                      //             ),
+                      //
+                      //             decoration: (_consultationController.selectedTimeSlot.value == timeSlot[index])
+                      //                 ? BoxDecoration(
+                      //               color: isExpired ? Colors.grey[300] : (isadvExpired ? Colors.orange[100] : Colors.lightBlue[100]),
+                      //               border: Border.all(color: isExpired ? Colors.red : (isadvExpired ? Colors.red : Colors.deepOrange), width: 5  ),
+                      //               borderRadius: BorderRadius.circular(15),
+                      //             )
+                      //                 : BoxDecoration(
+                      //               color: isExpired ? Colors.blueAccent[300] : (isadvExpired ? Colors.brown[100] : Colors.amber[400]),
+                      //               borderRadius: BorderRadius.circular(15),
+                      //             ),
+                      //       ),
+                      //     ),
+                      //   );
+                      // }
+                      // else {
                         return InkWell(
                           onTap: () {
-                            _consultationController.selectedTimeSlot.value = timeSlot[index];
+                            _consultationController.selectedTimeSlot.value =
+                            timeSlot[index];
                           },
                           child: Obx(
-                                () => Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                timeStartFormat +
-                                    ' - ' +
-                                    timeEndFormat +
-                                    '\n Under Processing'.tr,
-                                textAlign: TextAlign.center,
-                              ),
-                              decoration: (_consultationController.selectedTimeSlot.value ==
-                                  timeSlot[index])
-                                  ? BoxDecoration(
-                                color: Colors.red[100],
-                                border: Border.all(
-                                    color: Colors.deepOrange, width: 5),
-                                borderRadius: BorderRadius.circular(15),
-                              )
-                                  : BoxDecoration(
-                                color: Colors.deepOrange[400],
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
+                                () {
+                              // Get the current time
+                              DateTime currentTime = DateTime.now();
+
+                              // Get the start and end times of the slot
+                              DateTime startTime = timeSlot[index].timeSlot!;
+                              DateTime endTime = startTime.add(
+                                  Duration(minutes: timeSlot[index].duration!));
+
+                              // Check if the slot is expired (past the current time)
+                              isExpired = currentTime.isAfter(endTime);
+
+
+
+                              DateTime advendTime = currentTime.add(
+                                  Duration(hours: _consultationController.advhour, minutes: _consultationController.advminute));
+                              isadvExpired = startTime.isBefore(advendTime);
+
+
+                              advhour=_consultationController.advhour;
+                              advminute=_consultationController.advminute;
+
+    if (timeSlot[index].booking == 'Closed') {
+      return Container(
+        alignment: Alignment.center,
+        child:
+        // Text(
+        //   isExpired ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired' : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Available'.tr}',
+        //   textAlign: TextAlign.center,
+        // ),
+        Text(
+          isExpired
+              ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired'
+              : isadvExpired
+              ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired - $advhour:$advminute hour limit'
+              : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Under Processing...'
+              .tr}'
+          ,
+          textAlign: TextAlign.center,
+        ),
+        decoration: (_consultationController
+            .selectedTimeSlot.value == timeSlot[index])
+            ? BoxDecoration(
+          color: isExpired
+              ? Colors.grey[300]
+              : (isadvExpired
+              ? Colors.orange[100]
+              : Colors.deepOrange[100]),
+          border: Border.all(color: isExpired
+              ? Colors.red
+              : (isadvExpired ? Colors.red : Colors
+              .deepOrange), width: 5),
+          borderRadius: BorderRadius.circular(15),
+        )
+            : BoxDecoration(
+          color: isExpired
+              ? Colors.grey[300]
+              : (isadvExpired
+              ? Colors.orange[100]
+              : Colors.deepOrange[400]),
+          borderRadius: BorderRadius.circular(15),
+        ),
+
+
+      );
+    } else {
+      return Container(
+        alignment: Alignment.center,
+        child:
+        // Text(
+        //   isExpired ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired' : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Available'.tr}',
+        //   textAlign: TextAlign.center,
+        // ),
+        Text(
+          isExpired
+              ? '$timeStartFormat - $timeEndFormat\n${amt!}\nExpired'
+              : isadvExpired
+              ? '$timeStartFormat - $timeEndFormat\n${amt!}\n Expired - $advhour:$advminute hour limit'
+              : '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Available'
+              .tr}'
+          ,
+          textAlign: TextAlign.center,
+        ),
+        decoration: (_consultationController
+            .selectedTimeSlot.value == timeSlot[index])
+            ? BoxDecoration(
+          color: isExpired
+              ? Colors.grey[300]
+              : (isadvExpired
+              ? Colors.orange[100]
+              : Colors.green[100]),
+          border: Border.all(color: isExpired
+              ? Colors.red
+              : (isadvExpired ? Colors.red : Colors
+              .green), width: 5),
+          borderRadius: BorderRadius.circular(15),
+        )
+            : BoxDecoration(
+          color: isExpired
+              ? Colors.grey[300]
+              : (isadvExpired
+              ? Colors.orange[100]
+              : Colors.green[400]),
+          borderRadius: BorderRadius.circular(15),
+        ),
+
+
+      );
+    }
+                            },
                           ),
                         );
-                      }
-                      return InkWell(
-                        onTap: () {
-                          _consultationController.selectedTimeSlot.value = timeSlot[index];
-                        },
-                        child: Obx(
-                          () => Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              timeStartFormat +
-                                  ' - ' +
-                                  timeEndFormat +
-                                  '\n Available'.tr,
-                              textAlign: TextAlign.center,
-                            ),
-                            decoration: (_consultationController.selectedTimeSlot.value ==
-                                    timeSlot[index])
-                                ? BoxDecoration(
-                                    color: Colors.green[100],
-                                    border: Border.all(
-                                        color: Colors.green, width: 5),
-                                    borderRadius: BorderRadius.circular(15),
-                                  )
-                                : BoxDecoration(
-                                    color: Colors.green[400],
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                          ),
-                        ),
-                      );
+                     // }
+
+                      // return InkWell(
+                      //   onTap: () {
+                      //     _consultationController.selectedTimeSlot.value = timeSlot[index];
+                      //   },
+                      //   child: Obx(
+                      //     () => Container(
+                      //
+                      //       alignment: Alignment.center,
+                      //       child: Text(
+                      //         '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Available'.tr}',
+                      //         textAlign: TextAlign.center,
+                      //       ),
+                      //
+                      //       decoration: (_consultationController.selectedTimeSlot.value ==
+                      //               timeSlot[index])
+                      //           ? BoxDecoration(
+                      //               color: Colors.green[100],
+                      //               border: Border.all(
+                      //                   color: Colors.green, width: 5),
+                      //               borderRadius: BorderRadius.circular(15),
+                      //             )
+                      //           : BoxDecoration(
+                      //               color: Colors.green[400],
+                      //               borderRadius: BorderRadius.circular(15),
+                      //             ),
+                      //     ),
+                      //   ),
+                      // );
                     } else {
                       return Container(
                         alignment: Alignment.center,
                         child: Text(
-                          timeStartFormat +
-                              ' - ' +
-                              timeEndFormat +
-                              '\n Unavailable'.tr,
+                          '$timeStartFormat - $timeEndFormat\n${amt!}${'\n Unavailable'.tr}',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.nunito(color: Colors.white),
                         ),
@@ -180,15 +330,43 @@ class _MyPageState extends State<ConsultationDatePickerView> {
             alignment: Alignment.bottomCenter,
             child: InkWell(
               onTap: () {
+                DateTime currentTime = DateTime.now();
+
+                // Get the start and end times of the slot
+                DateTime startTime = _consultationController.selectedTimeSlot.value.timeSlot!;
+                DateTime endTime = startTime.add(Duration(minutes: _consultationController.selectedTimeSlot.value.duration!));
+
+                // Check if the slot is expired (past the current time)
+                isExpiredcheck = currentTime.isAfter(endTime);
+
+
+                DateTime advendTime = currentTime.add(Duration(hours: _consultationController.advhour,minutes: _consultationController.advminute));
+                isadvExpiredcheck = startTime.isBefore(advendTime);
+
+
+
                 // _consultationController.onInit();
-                if (_consultationController.selectedTimeSlot.value.timeSlotId == null) {
+                if (_consultationController.selectedTimeSlot.value.timeSlotId == null && _consultationController.numberoftimeslot != '0') {
                   Fluttertoast.showToast(msg: 'Please select time slot'.tr);
+                  return;
                   }
+                else if(_consultationController.numberoftimeslot == '0'){
+                  Fluttertoast.showToast(msg: 'Advisor not available'.tr);
+                }
                 else if (_consultationController.usaddress.isEmpty||_consultationController.usstate.isEmpty){
                   Fluttertoast.showToast(msg: 'Please Add Billing Details'.tr);
                   _consultationController.billing();
                 }
-                else{
+                else if (isExpiredcheck) {
+                  Fluttertoast.showToast(msg: 'Time Expired'.tr);
+
+                return;
+              } else if (isadvExpiredcheck) {
+                  Fluttertoast.showToast(msg: 'Expired - $advhour:$advminute hour limit'.tr);
+
+                return;
+              }
+               else{
                   _consultationController.confirm();
                 }
 
@@ -216,6 +394,7 @@ class _MyPageState extends State<ConsultationDatePickerView> {
       ),
     );
   }
+
 
   void showAlertDialog(BuildContext context, String title, String message) {
     showDialog(

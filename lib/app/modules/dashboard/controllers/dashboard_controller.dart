@@ -5,6 +5,8 @@ import 'package:hallo_doctor_client/app/service/auth_service.dart';
 import 'package:hallo_doctor_client/app/service/notification_service.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
 
+import '../../appointment/controllers/appointment_controller.dart';
+
 class DashboardController extends GetxController {
   final _selectedIndex = 0.obs;
   get selectedIndex => _selectedIndex.value;
@@ -26,7 +28,9 @@ class DashboardController extends GetxController {
     }
     EasyLoading.dismiss();
   }
-
+  void initTabOrder() {
+    Get.find<AppointmentController>().getListAppointment();
+  }
   @override
   void onClose() {}
   void increment() => count.value++;

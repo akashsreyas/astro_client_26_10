@@ -82,6 +82,8 @@ class ReviewService {
 
       print(timeSlot.timeSlotId);
 
+      DateTime now = DateTime.now();
+
       try {
         final post = await FirebaseFirestore.instance
             .collection('DoctorTimeslot')
@@ -95,7 +97,7 @@ class ReviewService {
 
         var batch = FirebaseFirestore.instance.batch();
         //Updates the field value, using post as document reference
-        batch.update(post, { 'callstatus': '1' });
+        batch.update(post, { 'callstatus': '1' , 'endtime':now });
         batch.commit();
 
       } catch (e) {
@@ -134,4 +136,7 @@ class ReviewService {
       return Future.error(e.toString());
     }
   }
+
+
 }
+

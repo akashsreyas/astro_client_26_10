@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/modules/widgets/empty_list.dart';
 
+import '../../../utils/timeformat.dart';
 import '../controllers/appointment_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -27,6 +28,7 @@ class AppointmentView extends GetView<AppointmentController> {
               shrinkWrap: true,
               itemBuilder: (contex, index) {
                 return Card(
+
                   child: ListTile(
                     onTap: () {
                       Get.toNamed('/appointment-detail',
@@ -40,8 +42,14 @@ class AppointmentView extends GetView<AppointmentController> {
                         listTimeslot[index].doctor!.doctorName!),
                     subtitle: Text(
                       'at '.tr +
-                          DateFormat('EEEE, dd, MMMM')
-                              .format(listTimeslot[index].timeSlot!),
+                          TimeFormat().formatDate(
+                              listTimeslot[index].timeSlot as DateTime) + "\nStatus : "+listTimeslot[index].status!,
+                      style: listTimeslot[index].status == 'Cancelled'
+                          ? TextStyle(
+                        color: Colors.red,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ):null,
                     ),
                     trailing: Icon(Icons.arrow_forward_ios),
                   ),
@@ -55,5 +63,16 @@ class AppointmentView extends GetView<AppointmentController> {
         ),
       ),
     );
+  }
+  Color _getContainerColor(String? callStatus) {
+    switch (callStatus) {
+      case '1':
+        return Colors.blue;
+      case '0':
+        return Colors.white;
+
+      default:
+        return Colors.white;
+    }
   }
 }

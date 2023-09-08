@@ -5,6 +5,8 @@ import 'package:date_picker_timeline/date_picker_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:hallo_doctor_client/app/models/review_model.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,6 +16,10 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share/share.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../controllers/profile_controller.dart';
+import 'InvoiceItem.dart';
+import 'change_password.dart';
 
 
 class InvoiceListScreen extends StatefulWidget {
@@ -25,7 +31,7 @@ class _MyDatePickerState extends State<InvoiceListScreen> {
   DateTime now = DateTime.now();
   final CollectionReference invoicesCollection =
   FirebaseFirestore.instance.collection('Invoice');
-
+  final ProfileController Controller = Get.put(ProfileController());
   DateTime _selectedDate = DateTime.now();
   DateTime _selectedendDate = DateTime.now();
 
@@ -117,50 +123,82 @@ class _MyDatePickerState extends State<InvoiceListScreen> {
     await FirebaseFirestore.instance.collection('Invoice').where('createdAt', isGreaterThanOrEqualTo:Timestamp.fromDate(start)).where('createdAt', isLessThanOrEqualTo: end).where('userId',isEqualTo:  UserService().currentUser!.uid).get();
     final List<List<dynamic>> csvData = [];
     csvData.add([
-      'Invoiceno', 'Description','Invoice Date','From Name', 'From Address','From State','From State Code','From GSTNo','To Name', 'To Address','To State','To State Code','To GSTNo','HSN/SAC',
+      'Invoice No', 'Description','Invoice Date','From Name', 'From Address','From State','From State Code','From GSTNo','To Name', 'To Address','To State','To State Code','To GSTNo','HSN/SAC',
       'Price','CGST','SGST','IGST',
-      'Total Tax','Total Amount',
+      'Total Tax','Total Amount','Status',
     ]); // Header row for CSV
 
     snapshot.docs.forEach((doc) {
       DateTime createdAtDateTime = doc.data()['createdAt'].toDate();
       String formattedDate = DateFormat('dd-MM-yyyy').format(createdAtDateTime);
       String gsttype= doc.data()['gstType'];
-      if(gsttype=='biz'){
+
+      print(gsttype);
+      print( doc.data()['invoiceno']);
+      if(gsttype == 'Biz'){
+        print("inside");
         fromname=bizName;
         fromaddress=bizAddress;
         fromstate=bizState;
         fromstatecode=bizStatecode;
+
+        csvData.add([
+
+          doc.data()['invoiceno'],
+          doc.data()['description'],
+          formattedDate,
+          fromname,
+          fromaddress,
+          fromstate,
+          fromstatecode,
+          doc.data()['advisorGstno'],
+          doc.data()['userName'],
+          doc.data()['userAddress'],
+          doc.data()['userState'],
+          doc.data()['userStatecode'],
+          doc.data()['userGstno'],
+          doc.data()['sac'],
+          doc.data()['excludedGstamt'],
+          doc.data()['cgst'],
+          doc.data()['sgst'],
+          doc.data()['igst'],
+          doc.data()['tax'],
+          doc.data()['includedGstamt'],
+          doc.data()['status'],
+        ]);
 
       }else{
         fromname=doc.data()['advisorName'];
         fromaddress= doc.data()['advisorAddress'];
         fromstate=   doc.data()['advisorState'];
         fromstatecode= doc.data()['advisorStatecode'];
-      }
-      csvData.add([
 
-        doc.data()['invoiceno'],
-        doc.data()['description'],
-        formattedDate,
-        fromname,
-        fromaddress,
-        fromstate,
-        fromstatecode,
-        doc.data()['advisorGstno'],
-        doc.data()['userName'],
-        doc.data()['userAddress'],
-        doc.data()['userState'],
-        doc.data()['userStatecode'],
-        doc.data()['userGstno'],
-        doc.data()['sac'],
-        doc.data()['excludedGstamt'],
-        doc.data()['cgst'],
-        doc.data()['sgst'],
-        doc.data()['igst'],
-        doc.data()['tax'],
-        doc.data()['includedGstamt'],
-      ]);
+        csvData.add([
+
+          doc.data()['invoiceno'],
+          doc.data()['description'],
+          formattedDate,
+          fromname,
+          fromaddress,
+          fromstate,
+          fromstatecode,
+          doc.data()['advisorGstno'],
+          doc.data()['userName'],
+          doc.data()['userAddress'],
+          doc.data()['userState'],
+          doc.data()['userStatecode'],
+          doc.data()['userGstno'],
+          doc.data()['sac'],
+          doc.data()['excludedGstamt'],
+          doc.data()['cgst'],
+          doc.data()['sgst'],
+          doc.data()['igst'],
+          doc.data()['tax'],
+          doc.data()['includedGstamt'],
+          doc.data()['status'],
+        ]);
+      }
+
     });
 
 
@@ -415,17 +453,61 @@ class _MyDatePickerState extends State<InvoiceListScreen> {
           final documentSnapshots = snapshot.data!.docs;
 
 
+          if (documentSnapshots.isEmpty) {
+            return Center(
+              child: Text(
+                'No invoices available',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            );
+          }
           return ListView.builder(
             itemCount: documentSnapshots.length,
             itemBuilder: (context, index) {
               final documentSnapshot = documentSnapshots[index];
               DateTime date = documentSnapshot['createdAt'].toDate();
+              String type=documentSnapshot['gstType'].toString();
+              return
+                InkWell(
+                  onTap: () {
+    if(type=="Biz"){
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InvoiceScreen(invoiceNumber: documentSnapshot['invoiceno'].toString(),advisoraddress:Controller.bizaddress,
+              useraddress:documentSnapshot['userAddress'].toString(),date:documentSnapshot['createdAt'].toDate(), excludedGstamt: documentSnapshot['excludedGstamt'],
+              cgst:documentSnapshot['cgst'].toString(),sgst:documentSnapshot['sgst'].toString(),igst:documentSnapshot['igst'].toString(),
+              includedGstamt:documentSnapshot['includedGstamt']
+          ),
 
-              return  Card(
+        ),
+      );
+    }else{
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InvoiceScreen(invoiceNumber: documentSnapshot['invoiceno'].toString(),advisoraddress:documentSnapshot['advisorAddress'],
+              useraddress:documentSnapshot['userAddress'].toString(),date:documentSnapshot['createdAt'].toDate(), excludedGstamt: documentSnapshot['excludedGstamt'],
+              cgst:documentSnapshot['cgst'].toString(),sgst:documentSnapshot['sgst'].toString(),igst:documentSnapshot['igst'].toString(),
+              includedGstamt:documentSnapshot['includedGstamt']
+          ),
+
+        ),
+      );
+    }
+
+                  },
+                  child:
+                Card(
+
                 elevation: 8.0,
+
                 margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
                 child: Container(
-                  decoration: BoxDecoration(color: Colors.white),
+                  color: type=='Biz' ? Colors.blue[50] : Colors.white,
 
                   child: ListTile(
                     contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -449,7 +531,7 @@ class _MyDatePickerState extends State<InvoiceListScreen> {
                         children: [
                           Text((documentSnapshot['includedGstamt']).toStringAsFixed(2)),
                         ]),
-                  ),),);
+                  ),),),);
             },
           );
         },

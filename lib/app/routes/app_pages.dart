@@ -20,6 +20,7 @@ import '../modules/detail_order/bindings/detail_order_binding.dart';
 import '../modules/detail_order/views/detail_order_view.dart';
 import '../modules/doctor_category/bindings/doctor_category_binding.dart';
 import '../modules/doctor_category/views/doctor_category_view.dart';
+import '../modules/doctorreview/views/review_view.dart';
 import '../modules/faq/bindings/faq_binding.dart';
 import '../modules/faq/views/faq_view.dart';
 import '../modules/forgot_password/bindings/forgot_password_binding.dart';
@@ -38,6 +39,7 @@ import '../modules/privacy_policy/bindings/privacy_policy_binding.dart';
 import '../modules/privacy_policy/views/privacy_policy_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/pages/billingdetails.dart';
+import '../modules/profile/views/pages/editbillingdetails.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/register/bindings/register_binding.dart';
 import '../modules/register/views/register_view.dart';
@@ -51,6 +53,8 @@ import '../modules/term_and_condition/bindings/term_and_condition_binding.dart';
 import '../modules/term_and_condition/views/term_and_condition_view.dart';
 import '../modules/top_rated_doctor/bindings/top_rated_doctor_binding.dart';
 import '../modules/top_rated_doctor/views/top_rated_doctor_view.dart';
+import '../modules/transaction_success/bindings/transaction_success_binding.dart';
+import '../modules/transaction_success/views/transaction_success_view.dart';
 import '../modules/video_call/bindings/video_call_binding.dart';
 import '../modules/video_call/views/video_call_view.dart';
 
@@ -200,6 +204,22 @@ class AppPages {
     GetPage(
       name: _Paths.BILLING,
       page: () => Billing_Details(),
+
+    ),
+    GetPage(
+      name: _Paths.EDITBILLING,
+      page: () => Editbilling_Details(),
+
+    ),
+    GetPage(
+      name: _Paths.DOCTOTREVIEW,
+      page: () => DoctorReviewListWidget(),
+
+    ),
+    GetPage(
+      name: _Paths.TRANSACTION_SUCCESS,
+      page: () => TransactionSuccessView(),
+      binding: TransactionSuccessBinding(),
 
     ),
   ];

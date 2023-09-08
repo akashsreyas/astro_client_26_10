@@ -5,6 +5,7 @@ import 'package:hallo_doctor_client/app/modules/login/views/widgets/divider_or.d
 import 'package:hallo_doctor_client/app/modules/login/views/widgets/label_button.dart';
 import 'package:hallo_doctor_client/app/modules/login/views/widgets/title_app.dart';
 import 'package:hallo_doctor_client/app/modules/widgets/submit_button.dart';
+import '../../../utils/helpers/validation.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -37,13 +38,9 @@ class LoginView extends GetView<LoginController> {
                           onEditingComplete: () {
                             node.nextFocus();
                           },
-                          validator: ((value) {
-                            if (value!.length < 3) {
-                              return 'Name must be more than two characters'.tr;
-                            } else {
-                              return null;
-                            }
-                          }),
+                        validator: ((value) {
+                          return Validation().validateEmail(value);
+                        }),
                           onSaved: (username) {
                             controller.username = username ?? '';
                           },
@@ -125,16 +122,16 @@ class LoginView extends GetView<LoginController> {
                   SizedBox(
                     height: 10,
                   ),
-                  Container(
-                    width: Get.width,
-                    height: 50,
-                    child: SignInButton(
-                      Buttons.Google,
-                      onPressed: () {
-                        controller.loginGoogle();
-                      },
-                    ),
-                  ),
+                  // Container(
+                  //   width: Get.width,
+                  //   height: 50,
+                  //   child: SignInButton(
+                  //     Buttons.Google,
+                  //     onPressed: () {
+                  //       controller.loginGoogle();
+                  //     },
+                  //   ),
+                  // ),
                   SizedBox(height: 20),
                   LabelButton(
                     onTap: () {

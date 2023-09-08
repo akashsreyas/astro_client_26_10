@@ -17,35 +17,35 @@ class AppointmentDetailView extends GetView<AppointmentDetailController> {
           centerTitle: true,
           actions: [
             //list if widget in appbar actions
-            PopupMenuButton(
-              color: Colors.white,
-              itemBuilder: (context) => [
-                PopupMenuItem<int>(
-                  value: 0,
-                  child: Text(
-                    "Reschedule Appointment".tr,
-                  ),
-                ),
-              ],
-              onSelected: (int item) => {
-                if (item == 0)
-                  {
-                    //cancel appointment click
-                    Get.defaultDialog(
-                        title: 'Reschedule Appointment'.tr,
-                        content: Text(
-                          'You can only reschedule this appointment once, Are you sure want to reschedule this appointment'
-                              .tr,
-                          textAlign: TextAlign.center,
-                        ),
-                        onCancel: () {},
-                        onConfirm: () {
-                          Get.back();
-                          controller.rescheduleAppointment();
-                        })
-                  }
-              },
-            ),
+            // PopupMenuButton(
+            //   color: Colors.white,
+            //   itemBuilder: (context) => [
+            //     PopupMenuItem<int>(
+            //       value: 0,
+            //       child: Text(
+            //         "Reschedule Appointment".tr,
+            //       ),
+            //     ),
+            //   ],
+            //   onSelected: (int item) => {
+            //     if (item == 0)
+            //       {
+            //         //cancel appointment click
+            //         Get.defaultDialog(
+            //             title: 'Reschedule Appointment'.tr,
+            //             content: Text(
+            //               'You can only reschedule this appointment once, Are you sure want to reschedule this appointment'
+            //                   .tr,
+            //               textAlign: TextAlign.center,
+            //             ),
+            //             onCancel: () {},
+            //             onConfirm: () {
+            //               Get.back();
+            //               controller.rescheduleAppointment();
+            //             })
+            //       }
+            //   },
+            // ),
           ]),
       body: SingleChildScrollView(
         child: Padding(
@@ -106,7 +106,7 @@ class AppointmentDetailView extends GetView<AppointmentDetailController> {
                                 height: 50, child: Text('Appointment Time'.tr)),
                             SizedBox(
                                 height: 50,
-                                child: Text(TimeFormat().formatDate(
+                                child: Text(': '+TimeFormat().formatDate(
                                     controller.selectedTimeslot.timeSlot!))),
                           ]),
                           TableRow(children: [
@@ -135,25 +135,49 @@ class AppointmentDetailView extends GetView<AppointmentDetailController> {
                               ),
                             ],
                           ),
-                          TableRow(
-                            children: [
-                              SizedBox(
-                                height: 50,
-                                child: Text('Status'.tr),
-                              ),
-                              SizedBox(
-                                height: 50,
-                                child: Text(
-                                  controller.selectedTimeslot.status ?? '',
-                                ),
-                              ),
-                            ],
-                          ),
+
+
+          TableRow(
+          children: [
+          SizedBox(
+          height: 50,
+          child: Text('Status'.tr),
+        ),
+        SizedBox(
+          height: 50,
+          child: Text(
+            ': Rs. ' +
+                (controller.selectedTimeslot.status != null
+                ? capitalizeFirstLetter(controller.selectedTimeslot.status!)
+                : ''),
+          ),
+        ),
+        ],
+      ),
+
+
+      // TableRow(
+                          //   children: [
+                          //     SizedBox(
+                          //       height: 50,
+                          //       child: Text('Status'.tr),
+                          //     ),
+                          //     SizedBox(
+                          //       height: 50,
+                          //       child: Text(
+                          //         controller.selectedTimeslot.status ?? '',
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                         ],
                       ),
                     ],
                   ),
                 ),
+          Visibility(
+            visible: controller.selectedTimeslot.status == 'booked' ,
+            child:
                 Obx(() => VideoCallButton(
                       function: () {
                         controller.startVideoCall();
@@ -161,28 +185,45 @@ class AppointmentDetailView extends GetView<AppointmentDetailController> {
                       text: 'Start Consultation'.tr,
                       active: controller.videoCallStatus.value,
                       nonActiveMsg:
-                          'the doctor has canceled the appointment, and your payment has been refunded'
+                          'The start consultation button will be active when the advisor starts the consultation'
                               .tr,
-                    )),
+                    )),),
                 SizedBox(
                   height: 10,
                 ),
-                controller.selectedTimeslot.status == 'refund'
-                    ? Text(
-                        'the doctor has canceled the appointment, and your payment has been refunded'
-                            .tr,
-                        style: Styles.greyTextInfoStyle,
-                      )
-                    : Text(
-                        'the start consultation button will be active when the doctor starts the consultation'
-                            .tr,
-                        style: Styles.greyTextInfoStyle,
-                      ),
+          Visibility(
+            visible: controller.selectedTimeslot.status == 'booked' ,
+            child: controller.selectedTimeslot.status == 'Cancelled'
+                ? Text(
+              'The advisor has canceled the appointment, and your payment has been refunded'.tr,
+              style: Styles.greyTextInfoStyle,
+            )
+                : Text(
+              'The start consultation button will be active when the advisor starts the consultation'.tr,
+              style: Styles.greyTextInfoStyle,
+            ),
+            // child:
+            //     controller.selectedTimeslot.status == 'refund'
+            //         ? Text(
+            //             'the advisor has canceled the appointment, and your payment has been refunded'
+            //                 .tr,
+            //             style: Styles.greyTextInfoStyle,
+            //           )
+            //         : Text(
+            //             'the start consultation button will be active when the advisor starts the consultation'
+            //                 .tr,
+            //             style: Styles.greyTextInfoStyle,
+            //           ),
+          ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return '';
+    return text[0].toUpperCase() + text.substring(1);
   }
 }

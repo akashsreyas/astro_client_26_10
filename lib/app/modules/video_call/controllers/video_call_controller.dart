@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/models/time_slot_model.dart';
@@ -8,6 +10,7 @@ import 'package:hallo_doctor_client/app/service/videocall_service.dart';
 import 'package:hallo_doctor_client/app/utils/environment.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:wakelock/wakelock.dart';
 
 
 class VideoCallController extends GetxController {
@@ -17,18 +20,24 @@ class VideoCallController extends GetxController {
   bool videoCallEstablished = false;
   VideoCallService videoCallService = Get.find();
   bool localUserJoined = false;
-  bool localAudioMute = false;
+  bool localAudioMute = true;
+  bool cameraEnabled = false;
   int? remoteUid;
   // Instantiate the client
   late RtcEngine engine;
-
+  RxBool isMinimized = false.obs;
   Object? get userInfo => null;
+  late final MethodChannel _channel; // Replace with your channel name
+  final floating = Floating();
+  bool isPipMode = false;
 
 
   @override
   void onInit() {
     super.onInit();
+
     initAgora();
+
   }
 
   @override
@@ -46,7 +55,10 @@ class VideoCallController extends GetxController {
 
 
     if (videoCallEstablished) {
-     // Get.offNamed(Routes.CONSULTATION_CONFIRM, arguments: timeSlot);
+
+
+
+      // Get.offNamed(Routes.CONSULTATION_CONFIRM, arguments: timeSlot);
       Get.close(1);
       Get.toNamed(Routes.CONSULTATION_CONFIRM, arguments: [
         {
@@ -69,6 +81,7 @@ class VideoCallController extends GetxController {
   }
 
   Future<void> initAgora() async {
+    Wakelock.enable();
     // retrieve permissions
     await [Permission.microphone, Permission.camera].request();
 
@@ -82,7 +95,7 @@ class VideoCallController extends GetxController {
           print("local user $uid joined");
           localUserJoined = true;
           videoCallEstablished = true;
-
+          engine.muteLocalAudioStream(localAudioMute);
           update();
 
         },
@@ -121,7 +134,8 @@ class VideoCallController extends GetxController {
 
   Future switchCamera() async {
     try {
-      await engine.switchCamera();
+       await engine.switchCamera();
+
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
     }
@@ -138,4 +152,49 @@ class VideoCallController extends GetxController {
   }
 
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    if (lifecycleState == AppLifecycleState.inactive) {
+      floating.enable(aspectRatio: Rational.square());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this as WidgetsBindingObserver);
+    floating.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.onInit();
+    WidgetsBinding.instance!.addObserver(this as WidgetsBindingObserver);
+  }
+  Future<void> enablePip(BuildContext context) async {
+    final rational = Rational.vertical();
+    final screenSize = MediaQuery.of(context).size * MediaQuery.of(context).devicePixelRatio;
+    final height = screenSize.width ~/ rational.aspectRatio;
+
+    final status = await floating.enable(
+      aspectRatio: rational,
+      // sourceRectHint: Rectangle<int>(
+      //   0,
+      //   (screenSize.height ~/ 2) - (height ~/ 2),
+      //   screenSize.width.toInt(),
+      //   height,
+      // ),
+    );
+    debugPrint('PiP enabled? $status');
+  }
+
+  Future<void> toggleCamera() async {
+     try {
+       cameraEnabled = !cameraEnabled;
+      await engine.muteLocalVideoStream(cameraEnabled);
+       update(); }
+       catch (e) {
+    Fluttertoast.showToast(msg: e.toString());
+    }
+  }
 }

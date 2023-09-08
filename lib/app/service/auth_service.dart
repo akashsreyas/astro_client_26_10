@@ -81,13 +81,15 @@ class AuthService {
   Future<bool> verifyPassword(String password) async {
     try {
       var firebaseUser = _auth.currentUser!;
+
       var authCredential = EmailAuthProvider.credential(
           email: firebaseUser.email!, password: password);
       var authResult =
           await firebaseUser.reauthenticateWithCredential(authCredential);
+
       return authResult.user != null;
-    } catch (e) {
-      return false;
+    } on FirebaseAuthException catch (e) {
+      return Future.error(e.message!);
     }
   }
 }

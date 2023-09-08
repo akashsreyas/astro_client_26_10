@@ -22,10 +22,12 @@ class ConsultationDatePickerController extends GetxController
   late List<TimeSlot> selectedDateTimeslot = List.empty();
   var selectedTimeSlot = TimeSlot().obs;
   Doctor doctor = Get.arguments[0];
+  int advhour= Get.arguments[1];
+  int advminute= Get.arguments[2];
   bool isReschedule = false;
   final UserService userService = Get.find();
   late String nav="1";
-
+  late String numberoftimeslot;
 
 
   late String drstate="",drname="",draddress="",drgstno="",usstate="",usname="",usaddress="",usgstno="",uniquekey="",drstcode="",usstcode="",gsttype="",timeslotbooking="",bookeduser="";
@@ -34,10 +36,11 @@ class ConsultationDatePickerController extends GetxController
 
 
     super.onInit();
-    if (Get.arguments[1] != null) isReschedule = true;
-    print('is Reschedule $isReschedule');
+    // if (Get.arguments[1] != null) isReschedule = true;
+    // print('is Reschedule $isReschedule');
     DoctorService().getDoctorTimeSlot(doctor).then((timeSlot) {
       allTimeSlot = timeSlot;
+
       updateScheduleAtDate(
           DateTime.now().day, DateTime.now().month, DateTime.now().year);
     }).onError((error, stackTrace) {
@@ -73,6 +76,13 @@ class ConsultationDatePickerController extends GetxController
     usstcode = languageSettingVersionRef1.data()!['code'];
 
 
+
+
+
+
+
+
+
   }
 
   @override
@@ -85,8 +95,9 @@ class ConsultationDatePickerController extends GetxController
             timeSlot.timeSlot!.month.isEqual(month) &&
             timeSlot.timeSlot!.year.isEqual(year))
         .toList();
-    print('Schedule for date ${date.toString()} is : ' +
-        schedule.length.toString());
+    numberoftimeslot=schedule.length.toString();
+    print('Schedule for date ${date.toString()} is : ${schedule.length}');
+    print(numberoftimeslot);
     change(schedule, status: RxStatus.success());
   }
 void billing(){
@@ -97,6 +108,7 @@ void billing(){
   );
 }
   void confirm() async {
+
 
     String user=userService.getUserId();
 
@@ -143,8 +155,12 @@ void billing(){
         String sac = languageSettingVersionRef.data()!['sacAdvisor'];
 
 
+
+
+
         //Check state is equal
         if(drstate==usstate){
+
           int cgst = languageSettingVersionRef.data()!['cgst'] as int;
           int sgst = languageSettingVersionRef.data()!['sgst'] as int;
 
@@ -185,8 +201,10 @@ void billing(){
       Fluttertoast.showToast(msg: e.toString());
     }
     }else if(timeslotbooking=="Closed" && user==bookeduser){
+
       try {
         if (isReschedule) {
+          print('hi');
           EasyLoading.show();
           await TimeSlotService()
               .rescheduleTimeslot(Get.arguments[1], selectedTimeSlot.value);
@@ -205,6 +223,7 @@ void billing(){
 
           //Check state is equal
           if(drstate==usstate){
+
             int cgst = languageSettingVersionRef.data()!['cgst'] as int;
             int sgst = languageSettingVersionRef.data()!['sgst'] as int;
 

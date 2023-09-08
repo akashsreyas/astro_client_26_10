@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
@@ -18,7 +20,7 @@ class DetailDoctorView extends GetView<DetailDoctorController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Doctor'.tr),
+        title: Text('Advisor'.tr),
         centerTitle: true,
       ),
       body: Stack(children: [
@@ -81,7 +83,8 @@ class DetailDoctorView extends GetView<DetailDoctorController> {
                         height: 5,
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {  Get.toNamed('/doctorreview',
+                            arguments: [doctor.doctorId!]); },
                         child: Text('View All'.tr),
                       )
                     ],
@@ -144,7 +147,7 @@ class DetailDoctorView extends GetView<DetailDoctorController> {
                       child: InkWell(
                         onTap: () {
                           Get.toNamed('/consultation-date-picker',
-                              arguments: [controller.selectedDoctor, null]);
+                              arguments: [controller.selectedDoctor, controller.advhour,controller.advminute, null]);
                         },
                         child: Container(
                           height: 50,

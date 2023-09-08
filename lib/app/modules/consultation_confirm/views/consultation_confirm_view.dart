@@ -24,8 +24,8 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
             child: Obx(() => Column(
                   children: [
                     Text(
-                      'Has the consultation with the'.tr +
-                          controller.timeSlot.doctor!.doctorName! +
+                      'Has the consultation with the'.tr +' '+
+                          controller.timeSlot.doctor!.doctorName! +' '+
                           'been completed?'.tr,
                       style: GoogleFonts.nunito(fontSize: 25),
                     ),
@@ -36,7 +36,7 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
                         onTap: () {
                           Get.defaultDialog(
                               title: 'Confirm'.tr,
-                              middleText: 'Payment for doctor '.tr +
+                              middleText: 'Payment for advisor '.tr +
                                   controller.timeSlot.doctor!.doctorName! +
                                   ' will be made if you confirm this transaction'
                                       .tr,
@@ -58,18 +58,10 @@ class ConsultationConfirmView extends GetView<ConsultationConfirmController> {
                       },
                       child: Text('No, there is a problem'.tr),
                     ),
-                    TextButton(
+                    Text('we love to hear from you and write to us'.tr),
 
-                      onPressed: () {
-
-                      },
-                      child: Text('we love to hear from you and write to us'.tr),
-
-                    ),TextButton(
-                      onPressed: () {
-
-                      },
-                      child: Text('admin@bizboozt.co.in'.tr),
+                    Text(
+                      'admin@bizboozt.co.in'.tr,
                     ),
 
                     Visibility(

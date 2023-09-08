@@ -62,7 +62,7 @@ class EditImagePage extends GetView<ProfileController> {
                         height: 350,
                       );
                     } else {
-                      return Image.asset('assets/images/user.png');
+                      return Image.asset('assets/images/newdefault.png');
                     }
                   },
                 ),

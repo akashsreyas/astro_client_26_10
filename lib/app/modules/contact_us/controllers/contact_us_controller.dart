@@ -5,10 +5,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/service/contact_us_service.dart';
 
+import '../../../service/user_service.dart';
+
 class ContactUsController extends GetxController {
   //TODO: Implement ContactUsController
   TextEditingController messageTextController = TextEditingController();
+  TextEditingController usernameTextController = TextEditingController();
 
+  String email = UserService().currentUser!.email!;
   @override
   void onInit() {
     super.onInit();

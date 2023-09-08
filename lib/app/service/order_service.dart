@@ -22,7 +22,7 @@ class OrderService {
   }
 
   Future<Order> getOrder(TimeSlot timeSlot,String room) async {
-
+    print('lima1');
     try {
       var orderData = await FirebaseFirestore.instance
           .collection('Order')
@@ -31,6 +31,8 @@ class OrderService {
           .get();
       print('order length : ' + orderData.docs.length.toString());
       var data = orderData.docs.elementAt(0).data();
+      print('data');
+      print(data);
       data['orderId'] = orderData.docs.elementAt(0).reference.id;
       Order order = Order.fromMap(data);
 
@@ -41,11 +43,12 @@ class OrderService {
   }
 
   Future confirmOrder(TimeSlot timeSlot, String room) async {
-
+print('lima');
+print(room);
 
     try {
       var order = await getOrder(timeSlot,room);
-
+      print(order);
       return setOrderToComplete(order);
     } catch (e) {
       return Future.error(e.toString());
@@ -53,7 +56,7 @@ class OrderService {
   }
 
   Future<void> setOrderToComplete(Order order) async {
-
+    print('lima2');
     await FirebaseFirestore.instance
         .collection("Order")
         .doc(order.orderId)

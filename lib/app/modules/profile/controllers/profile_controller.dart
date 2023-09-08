@@ -16,6 +16,10 @@ import 'package:hallo_doctor_client/app/service/auth_service.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
 import 'package:hallo_doctor_client/app/translation/en_US.dart';
 
+
+import '../../../service/notification_service.dart';
+import '../../appointment/controllers/appointment_controller.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
 import '../views/pages/billingdetails.dart';
 import '../views/pages/invoice.dart';
 
@@ -36,18 +40,29 @@ class ProfileController extends GetxController {
   var formkey = GlobalKey<FormState>();
   var userids=UserService().currentUser!.uid;
   late String v="1";
+  late String country="Select Country",state="",gst="",address="",phone="";
+  RxInt selectedRadio = 0.obs;
+  late String bizaddress;
+
+
   @override
   void onInit() async {
     super.onInit();
     // PackageInfo packageInfo = await PackageInfo.fromPlatform();
     // appVersion.value = packageInfo.version;
+
+    var languageSettingVersionRef1 = await FirebaseFirestore.instance
+        .collection('Settings')
+        .doc('withdrawSetting')
+        .get();
+    bizaddress = languageSettingVersionRef1.data()!['address'];
   }
 
   @override
   void onReady() {
     super.onReady();
     var user = userService.currentUser;
-    print('user : ' + user.toString());
+    print('user : ' + profilePic.value);
 
     profilePic.value = userService.getProfilePicture()!;
     username.value = user!.displayName!;
@@ -56,7 +71,13 @@ class ProfileController extends GetxController {
 
   @override
   void onClose() {}
+  Future<void> handleRadioValueChange(int? value) async {
+    print(value);
+    if (value != null) {
+      selectedRadio.value = value;
+    }
 
+  }
   void logout() async {
     Get.defaultDialog(
       title: 'Logout'.tr,
@@ -80,14 +101,53 @@ class ProfileController extends GetxController {
     Get.to(() => UpdateEmailPage());
   }
 
-  toChangePassword() {
+  toChangePassword() async {
     Get.to(() => ChangePasswordPage());
+
+
+
   }
-  toBilling() {
-    Get.toNamed(
-      '/billingdetails',
-      arguments: '0',
-    );
+  toBilling() async {
+
+    var languageSettingVersionRef1 = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userService.getUserId())
+        .get();
+    country = languageSettingVersionRef1.data()!['country'] ?? 'Select Country';
+    state = languageSettingVersionRef1.data()!['state'] ?? 'Select State';
+    address = languageSettingVersionRef1.data()!['address'] ?? '';
+    gst = languageSettingVersionRef1.data()!['gstno'] ?? '' ;
+    phone = languageSettingVersionRef1.data()!['phone'] ?? '' ;
+
+    if (country == null || state == null || address == null || gst == null) {
+      Get.toNamed('/editbillingdetails', arguments: [
+        {
+          'country': country,
+          'state': state,
+          'address': address,
+          'gst': gst,
+          'phone': phone,
+
+        }
+      ]);
+    } else {
+      Get.toNamed('/editbillingdetails', arguments: [
+        {
+          'country': country,
+          'state': state,
+          'address': address,
+          'gst': gst,
+          'phone': phone,
+        }
+      ]);
+    }
+
+
+
+    // Get.toNamed(
+    //   '/billingdetails',
+    //   arguments: '0',
+    // );
    // Get.to(() => Billing_Details());
   }
 
@@ -129,8 +189,17 @@ class ProfileController extends GetxController {
     }
   }
 
-  void changePassword(String currentPassword, String newPassword) async {
+  void changePassword(String currentPassword, String newPassword, String confirmpwd) async {
     // if (!(await checkGoogleLogin())) return;
+    if (newPassword != confirmpwd) {
+
+
+      Fluttertoast.showToast(msg: 'Passwords do not match'.tr);
+      EasyLoading.dismiss();
+      return;
+    }else{
+      print('bady');
+    }
 
     try {
       await UserService().changePassword(currentPassword, newPassword);
@@ -182,7 +251,7 @@ class ProfileController extends GetxController {
     }
   }
 
-  void addDataWithId(String _selectedValue,String state,String statecode,String gstno,String address) async {
+  void addDataWithId(String _selectedValue,String state,String statecode,String gstno,String address,String mobile) async {
     var user =UserService().currentUser!.uid;
     try {
       await FirebaseFirestore.instance
@@ -194,9 +263,11 @@ class ProfileController extends GetxController {
         'code': statecode,
         'gstno':gstno,
         'address':address,
+        'phone':mobile,
+
       });
       print('Data updated successfully!');
-    notifyChildrens();
+      notifyChildrens();
 
       Fluttertoast.showToast(msg: 'Data updated successfully!'.tr);
     } catch (error) {
@@ -212,10 +283,11 @@ class ProfileController extends GetxController {
   }
 
   void profile(){
-    Get.toNamed(
-      '/profile',
-      arguments: [],
-    );
+    // Get.toNamed(
+    //   '/profile',
+    //   arguments: [],
+    // );
+    Get.back();
   }
 
 }

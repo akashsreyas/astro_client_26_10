@@ -1,3 +1,5 @@
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,13 +9,18 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/models/time_slot_model.dart';
 import 'package:hallo_doctor_client/app/service/timeslot_service.dart';
+import 'package:hallo_doctor_client/app/service/videocall_service.dart';
 import 'package:hallo_doctor_client/app/utils/styles/styles.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../utils/environment.dart';
 
 
 
@@ -30,16 +37,26 @@ Future<void> _firebaseMessaggingBackgroundHandler(RemoteMessage message) async {
   print('a big message just show up ' + message.messageId!);
 }
 
+
+
 class NotificationService {
+
+
+
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   NotificationService() {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessaggingBackgroundHandler);
+
+
     setupFlutterNotification();
     setupTimezone();
     setupNotificationAction();
   }
+
+
   void setupFlutterNotification() async {
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -92,7 +109,7 @@ class NotificationService {
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('a new message opened app are was published');
+      print('A new message opened app are was published');
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -111,13 +128,17 @@ class NotificationService {
     //printInfo(info: 'local timezone : ' + currentTimeZone);
   }
 
+
   void setupNotificationAction() async {
+
+    print('inside app 111');
     FlutterCallkitIncoming.onEvent.listen((event) async {
       switch (event!.name) {
         case CallEvent.ACTION_CALL_INCOMING:
           print('incoming call gaes');
           break;
         case CallEvent.ACTION_CALL_ACCEPT:
+          print('inside app back');
           print('body ' + event.body['extra']['roomName']);
           print('accept the data');
           TimeSlot selectedTimeslot = await TimeSlotService()
@@ -131,7 +152,11 @@ class NotificationService {
           ]);
           break;
         case CallEvent.ACTION_CALL_DECLINE:
+          RtcEngine engine = await RtcEngine.create(Environment.agoraAppId);
+          await cutAgoraCall(engine,event.body['extra']['roomName']);
+
           print('declien call gaes');
+
           break;
       }
     });
@@ -140,9 +165,33 @@ class NotificationService {
     //   onCallRejected: _onCallRejected,
     // );
   }
+  Future removeRoom(String roomId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('RoomVideoCall')
+          .doc(roomId)
+          .delete();
+      //await database.child('room/' + roomName).remove();
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
+  Future<void> cutAgoraCall(RtcEngine rtcEngine,String roomId) async {
+    try {
+      // Terminate the Agora call
+      removeRoom(roomId);
+      await rtcEngine.leaveChannel();
+      rtcEngine.destroy();
 
+
+    } catch (e) {
+      print('Error cutting Agora call: $e');
+    }
+  }
   Future showCallNotification(String fromName, String roomName, String token,
       String selectectedTimeslotId) async {
+    print("hi");
+
     var params = <String, dynamic>{
       'id': 'adsfadfds',
       'nameCaller': fromName,
@@ -167,7 +216,7 @@ class NotificationService {
         'isShowCallback': false,
         'ringtonePath': 'system_ringtone_default',
         'backgroundColor': '#0955fa',
-        'backgroundUrl': 'https://i.pravatar.cc/500',
+        'backgroundUrl': '',
         'actionColor': '#4CAF50'
       },
       'ios': <String, dynamic>{
@@ -187,6 +236,7 @@ class NotificationService {
         'ringtonePath': 'system_ringtone_default'
       }
     };
+
     await FlutterCallkitIncoming.showCallkitIncoming(params);
   }
 
@@ -208,6 +258,39 @@ class NotificationService {
     } catch (e) {
       return Future.error(e.toString());
     }
+  }
+
+  setNotificationpaymentsuccess(DateTime time) {
+    var notificationDate = Jiffy(time).subtract(minutes: 10).dateTime;
+    printInfo(
+        info: 'Date time sebelum TZ Date (dikurang 10 menit): ' +
+            notificationDate.toString());
+    var myTzDatetime = tz.TZDateTime.local(
+      notificationDate.year,
+      notificationDate.month,
+      notificationDate.day,
+      notificationDate.hour,
+      notificationDate.minute,
+      notificationDate.second,
+      notificationDate.millisecond,
+    );
+    printInfo(info: 'Date time setelah TZ Date ' + myTzDatetime.toString());
+    flutterLocalNotificationsPlugin.zonedSchedule(
+        0,
+        'Consultation will start soon',
+        "The consultation session will start in 10 minutes",
+        myTzDatetime,
+        NotificationDetails(
+          android: AndroidNotificationDetails(channel.id, channel.name,
+              channelDescription: channel.description,
+              importance: Importance.high,
+              color: Styles.primaryBlueColor,
+              icon: '@mipmap/ic_launcher'),
+        ),
+        uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+        androidAllowWhileIdle: true);
+    printInfo(info: 'set local notification 10 before notification happen');
   }
 
   //set local notification before appoinment time

@@ -14,7 +14,7 @@ class TopRatedDoctorView extends GetView<TopRatedDoctorController> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text('Top Rated Doctor'.tr),
+        title: Text('Top Rated Advisor'.tr),
         centerTitle: true,
       ),
       body: Container(
@@ -49,7 +49,7 @@ class TopRatedDoctorView extends GetView<TopRatedDoctorController> {
                     ),
                 onEmpty: Center(
                     child: EmptyList(
-                        msg: 'No Doctor Registered in this Category'.tr))),
+                        msg: 'No Advisor Registered in this Category'.tr))),
           )
         ]),
       ),

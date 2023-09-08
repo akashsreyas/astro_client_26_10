@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:hallo_doctor_client/app/utils/constants/style_constants.dart';
 import '../controllers/detail_order_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+
 enum ChosePayment { addCard, creditCard }
 
 class DetailOrderView extends GetView<DetailOrderController> {
@@ -19,7 +21,7 @@ class DetailOrderView extends GetView<DetailOrderController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Detail Order'.tr),
+          title: Text('Order Summary'.tr),
           centerTitle: true,
         ),
         body: Padding(
@@ -36,7 +38,7 @@ class DetailOrderView extends GetView<DetailOrderController> {
                           color: mTitleColor),
                     ),
                     Text(
-                      'before making a payment, make sure the items below are correct'
+                      'Before making a payment, make sure the items below are correct'
                           .tr,
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w400,
@@ -193,21 +195,22 @@ class DetailOrderView extends GetView<DetailOrderController> {
                             height: 20,
                           ),
                           Container(
-
                             width: double.infinity,
-                            height: 25,
+                            height: 50,
                             alignment: Alignment.topLeft,
                             padding: EdgeInsets.only(right: 30),
-
                             child: Text(
-                              'Billing Address : '.tr +
-                                  controller.usaddress.toString(),
-                                  style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                  color: mTitleColor),
+                              'Billing Address : '.tr + controller.usaddress.toString(),
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                color: mTitleColor,
+                              ),
+                              textAlign: TextAlign.left,
+                              maxLines: null, // Allow the text to wrap to multiple lines
                             ),
                           ),
+
                           SizedBox(
                             height: 10,
                           ),
@@ -242,19 +245,11 @@ class DetailOrderView extends GetView<DetailOrderController> {
                     ),
 
                     InkWell(
-                      onTap: () {
-                        // Get.defaultDialog(
-                        //   title: 'Test Mode',
-                        //   content: Text(
-                        //       'This is a testing mode, to make a payment in test mode, please enter the number 42 consecutively in the credit card details, E.g. credit card: 424242424244242'),
-                        //   textConfirm: 'Make Payment With Stripe',
-                        //   onConfirm: () {
-                        //     Get.back();
-                        //     controller.makePayment();
-                        //   },
-                        // );
-                        //
-                        controller.payWithRazorpay();
+                      onTap: () async {
+
+
+                         _showPopUpChooser(context);
+
                       },
 
                       child: Container(
@@ -350,5 +345,74 @@ class DetailOrderView extends GetView<DetailOrderController> {
         ),
       ),
     );
+  }
+  void _showPopUpChooser(BuildContext context) {
+    getPaymentModes().then((paymentModes) {
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  title: Text(
+                    'Choose Payment Gateway',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  tileColor: Colors.blue,
+                ),
+                if (paymentModes['razorState'] == true)
+                  ListTile(
+                    leading: Image.asset(
+                      'assets/icons/razicon.png', // Replace with the path to your asset icon
+                      width: 50, // Set the desired width
+                      height: 50, // Set the desired height
+                    ),
+                    title: Text('Razorpay(Card, UPI, Netbanking, Wallet)'),
+                    onTap: () {
+                      // Handle Razorpay payment
+                      controller.payWithRazorpay();
+                    },
+                  ),
+                if (paymentModes['instaState'] == true)
+                  ListTile(
+                    leading: Image.asset(
+                      'assets/icons/instamojoicon.png', // Replace with the path to your asset icon
+                      width: 50, // Set the desired width
+                      height: 50, // Set the desired height
+                    ),
+                    title: Text('Instamojo(Upi, Netbanking, Wallet)'),
+                    onTap: () {
+
+                      controller.payWithInstamojo();
+
+                    },
+                  ),
+                // Add more options if needed
+              ],
+            ),
+          );
+        },
+      );
+    });
+  }
+
+
+
+  Future<Map<String, bool>> getPaymentModes() async {
+    DocumentSnapshot snapshot =
+    await FirebaseFirestore.instance.collection('Settings').doc('instaMojo').get();
+
+    Map<String, bool> paymentModes = {
+      'instaState': snapshot.get('instaState') == 'true', // Convert to bool
+      'razorState': snapshot.get('razorState') == 'true', // Convert to bool
+    };
+
+    return paymentModes;
   }
 }

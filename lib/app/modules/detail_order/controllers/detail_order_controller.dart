@@ -1,5 +1,7 @@
 
 
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -13,12 +15,23 @@ import 'package:hallo_doctor_client/app/service/payment_service.dart';
 import 'package:hallo_doctor_client/app/service/user_service.dart';
 import 'package:hallo_doctor_client/app/utils/constants/constants.dart';
 import 'package:hallo_doctor_client/app/utils/environment.dart';
+
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../routes/app_pages.dart';
+
+
+import '../../../service/OrderIdProvider.dart';
+import '../../../service/OrderInfo.dart';
+import '../../appointment/controllers/appointment_controller.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../views/instamojoview.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info/package_info.dart';
 
 class DetailOrderController extends GetxController {
   final username = ''.obs;
@@ -46,7 +59,7 @@ class DetailOrderController extends GetxController {
 
   late double paidamt;
 
-
+  late String orderID="10";
 
 
 
@@ -56,11 +69,12 @@ class DetailOrderController extends GetxController {
   late String clientSecret;
   Razorpay _razorpay = Razorpay();
   late var options;
-  late String orderId;
-
+  late String orderId="";
+  late num bizamount=0;
   @override
   void onInit() {
     super.onInit();
+
     userService.getUsername().then((value) {
       username.value = value;
     });
@@ -121,58 +135,94 @@ class DetailOrderController extends GetxController {
       EasyLoading.dismiss();
     }
   }
+  Future<void> payWithInstamojo()  async {
+    String phone;
 
-  void payWithRazorpay() async {
+    // final String url = 'upi://pay?pa=instamojo.d482745ee9734336ae2e01b3f0b8aa32@icici&pn=Instamojo&tr=MOJa7d3dc327c29dcd6a51fbd5172756f51&cu=INR&mc=7392&am=10.00&/#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end';
+    //
+    // if (await canLaunch(url)) {
+    //   await launch(url);
+    // } else {
+    //   throw 'Could not launch Google Pay link.';
+    // }
+
+    var languageSettingVersionRef1 = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userService.getUserId())
+        .get();
+    String user = languageSettingVersionRef1.data()!['displayName'] ;
+
+    String country = languageSettingVersionRef1.data()!['country'] ;
+
+if(country=='India'){
+   phone = languageSettingVersionRef1.data()!['phone'] ;
+}else{
+   phone = '';
+}
+
+
+    String transactionurl="";
+
+
+    EasyLoading.show(status: 'Please wait... Connecting with payment gateway....');
+    bizamount=((((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!)).toPrecision(2);
+    OrderInfo orderInfo = await PaymentService().payWithInstamojo(
+        selectedTimeSlot.timeSlotId!, userService.getUserId(),user,userService.getEmail(),phone,bizamount);
 
 
 
-     // Output: April 26, 2023 at 11:53:00 AM
 
-    paidamt=(((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!);
+    orderId = orderInfo.orderId;
+    transactionurl = orderInfo.url;
 
-    EasyLoading.show();
-    try {
-       orderId = await PaymentService().payWithRazorpay(
-          selectedTimeSlot.timeSlotId!, userService.getUserId());
-      print('order id : $orderId');
-      print('price : ${   ((((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!)*100).round()}');
-      String username = await userService.getUsername();
-      options = {
-        'key': Environment.razorpayKeyId,
-        'amount': ((((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!)*100).round(),
-        'name': username,
-        'notes': {'order_id': orderId},
-        'description': 'Timeslot Consultation',
-        'prefill': {
-          'contact': '8888888888',
-          'email': userService.currentUser!.email
-        }
-      };
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('orderId', orderId); // Example: saving a string
+    prefs.setString('previoustransactionStatus', "NotPay");
 
-      _razorpay.open(options);
-      //PaymentService().payWithRazorpay();
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    } finally {
-      EasyLoading.dismiss();
-    }
+
+
+  
+    // bizamount=10;
+
+    Get.to(() => instamojoview(instamojourl: transactionurl,amount:bizamount));
   }
 
-  _handlePaymentSuccess(PaymentSuccessResponse response) async {
-
-    var pid=response.paymentId;
-    try {
-
-      await FirebaseFirestore.instance
-          .collection('Order')
-          .doc(orderId)
-          .update({'linkReceipt': pid});
-
-    } catch (e) {
-      return Future.error(e.toString());
-    }
 
 
+
+
+
+
+
+
+
+
+  Future<void> Instamojosuccess(String paymentid) async {
+    var user = userService.currentUser;
+  orderId=  await PaymentService().successInstamojoPayment(orderId,bizamount);
+  var pid=paymentid;
+  var username=await userService.getUsername();
+  var email=user?.email!;
+  try {
+
+    await FirebaseFirestore.instance
+        .collection('Order')
+        .doc(orderId)
+        .update({'linkReceipt': pid,
+                 'username': username,
+                  'email':email,
+
+
+        });
+
+  } catch (e) {
+    return Future.error(e.toString());
+  }
+
+  addInvoice();
+  }
+
+  Future<void> Instamojofail() async{
     var username=await userService.getUsername();
     try {
 
@@ -184,7 +234,73 @@ class DetailOrderController extends GetxController {
     } catch (e) {
       return Future.error(e.toString());
     }
-    addInvoice();
+  }
+  void goHome() {
+
+    Get.offAllNamed('dashboard');
+    Get.find<DashboardController>().selectedIndex = 2;
+    Get.find<AppointmentController>().getListAppointment();
+  }
+  void payWithRazorpay() async {
+    String razid ="";
+
+    Environment environment = Environment();
+    environment.razorpayid().then((value) {
+      razid = value;
+    }).catchError((error) {
+      print(error);
+    });
+
+    var languageSettingVersionRef1 = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userService.getUserId())
+        .get();
+    String user = languageSettingVersionRef1.data()!['displayName'] ;
+    String phone = languageSettingVersionRef1.data()!['phone'] ;
+
+
+
+    paidamt=(((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!);
+
+    EasyLoading.show();
+    try {
+       orderId = await PaymentService().payWithRazorpay(
+           selectedTimeSlot.timeSlotId!, userService.getUserId(),user,userService.getEmail(),phone,bizamount);
+
+       SharedPreferences prefs = await SharedPreferences.getInstance();
+       prefs.setString('orderId', orderId); // Example: saving a string
+       prefs.setString('previoustransactionStatus', "NotPay");
+
+
+      print('order id : $orderId');
+      print('price : ${   ((((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!)*100).round()}');
+      String username = await userService.getUsername();
+      options = {
+        'key': razid,
+         // 'amount': 1*100,
+        'amount': ((((selectedTimeSlot.price! * totaltax)/100)+selectedTimeSlot.price!)*100).round(),
+        'name': username,
+        'notes': {'order_id': orderId},
+        'description': 'Timeslot Consultation',
+        'prefill': {
+          'contact': phone,
+          'email': userService.currentUser!.email
+        }
+      };
+       print('order id : $options');
+      _razorpay.open(options);
+      //PaymentService().payWithRazorpay();
+    } catch (e) {
+      Fluttertoast.showToast(msg: e.toString());
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  _handlePaymentSuccess(PaymentSuccessResponse response) async {
+
+
+
 
 
     Get.toNamed('/payment-success', arguments: [
@@ -206,7 +322,20 @@ class DetailOrderController extends GetxController {
     notificationService.setNotificationAppointment(selectedTimeSlot.timeSlot!);
   }
 
-  _handlePaymentError(PaymentFailureResponse response) {
+  _handlePaymentError(PaymentFailureResponse response) async {
+
+
+    var username=await userService.getUsername();
+    try {
+
+      await FirebaseFirestore.instance
+          .collection('Order')
+          .doc(orderId)
+          .update({'username': username});
+
+    } catch (e) {
+      return Future.error(e.toString());
+    }
 
     Fluttertoast.showToast(
         msg: response.message.toString(), toastLength: Toast.LENGTH_LONG);
@@ -304,6 +433,9 @@ class DetailOrderController extends GetxController {
       'sac':sac,
       'description':formattedDate+"_"+drname+"_"+usname,
       'gstType':gsttype,
+      'status':'Success',
+      'cancelled':now,
+      'action':'success',
 
 
 

@@ -100,16 +100,19 @@ class DoctorService {
   }
 
   Future<List<Doctor>> searchDoctor(String doctorName) async {
+    doctorName=doctorName.toLowerCase();
+
     try {
       print('doctor name : ' + doctorName);
       if (doctorName.isEmpty) return [];
       var doctorRef = await FirebaseFirestore.instance
           .collection('Doctors')
-          .where('doctorName',
+          .where('searchName',
               isGreaterThanOrEqualTo: doctorName,
               isLessThan: doctorName.substring(0, doctorName.length - 1) +
                   String.fromCharCode(
                       doctorName.codeUnitAt(doctorName.length - 1) + 1))
+
           .get();
       List<Doctor> listDoctor = doctorRef.docs.map((doc) {
         var data = doc.data();
@@ -123,7 +126,16 @@ class DoctorService {
     } catch (e) {
       return Future.error(e.toString());
     }
+
+
+
+
+
   }
+
+
+
+
 
   Future<String> getUserId(Doctor doctor) async {
     try {
@@ -139,7 +151,30 @@ class DoctorService {
     }
   }
 
+  Future<Doctor?> getDoctor({bool forceGet = false}) async {
+    try {
+      if (DoctorService.doctor != null && forceGet == false) {
+        return DoctorService.doctor;
+      }
 
+      var doctorId = await UserService().getDoctorId();
+      print('doctor id : ' + doctorId);
+      var doctorReference = await FirebaseFirestore.instance
+          .collection('Doctors')
+          .doc(doctorId)
+          .get();
+      if (!doctorReference.exists) return null;
+      print('data doctor : ' + doctorReference.data().toString());
+      var data = doctorReference.data() as Map<String, dynamic>;
+      data['doctorId'] = doctorId;
+      Doctor doctor = Doctor.fromJson(data);
+      DoctorService.doctor = doctor;
+      DoctorService().currentDoctor = doctor;
+      return doctor;
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future saveDoctorDetail(
       {required String doctorName,

@@ -12,7 +12,7 @@ class ListDoctorView extends GetView<ListDoctorController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Doctor'.tr),
+        title: Text('Advisor'.tr),
         centerTitle: true,
       ),
       body: Container(
@@ -44,7 +44,7 @@ class ListDoctorView extends GetView<ListDoctorController> {
                     ),
                 onEmpty: Center(
                     child: EmptyList(
-                        msg: 'No Doctor Registered in this Category'.tr))),
+                        msg: 'No Advisor Registered in this Category'.tr))),
           )
         ]),
       ),

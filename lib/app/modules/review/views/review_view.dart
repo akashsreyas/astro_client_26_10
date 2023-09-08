@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:get/get.dart';
 import 'package:hallo_doctor_client/app/modules/dashboard/controllers/dashboard_controller.dart';
@@ -19,7 +20,7 @@ class ReviewView extends GetView<ReviewController> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Review Doctor'.tr),
+          title: Text('Review Advisor'.tr),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
@@ -65,7 +66,7 @@ class ReviewView extends GetView<ReviewController> {
                           // print(rating);
 
                           _currentindex=rating;
-                          print("ggggggggg");
+
                           print(rating);
                           print(_currentindex);
                         },
@@ -76,6 +77,7 @@ class ReviewView extends GetView<ReviewController> {
                   submitButton(
                       onTap: () {
                         print("current index ${_currentindex}");
+                        Fluttertoast.showToast(msg: 'Thankyou for your feedback.'.tr);
                         controller.saveReiew(_currentindex);
                         Navigator.of(context)
                             .pushNamedAndRemoveUntil(Routes.DASHBOARD, (Route<dynamic> route) => false);

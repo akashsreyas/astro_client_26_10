@@ -15,10 +15,13 @@ class ChangePasswordPage extends GetView<ProfileController> {
     final node = FocusScope.of(context);
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           elevation: 0,
           title: Text(
             'Change Password'.tr,
+            style: TextStyle(
+              color: Colors.black, // Set the desired text color here
+            ),
           ),
           centerTitle: true,
           iconTheme: IconThemeData(color: Colors.black),
@@ -26,7 +29,7 @@ class ChangePasswordPage extends GetView<ProfileController> {
         body: SingleChildScrollView(
           child: FormBuilder(
             key: _formKey,
-            child: Obx(() => Column(
+            child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -39,7 +42,7 @@ class ChangePasswordPage extends GetView<ProfileController> {
                           FormBuilderValidators.minLength(3)
                         ]),
                         decoration:
-                            InputDecoration(labelText: 'Curren Password'),
+                            InputDecoration(labelText: 'Current Password'),
                         name: 'currentPassword',
                         keyboardType: TextInputType.visiblePassword,
                         onEditingComplete: () => node.nextFocus(),
@@ -51,7 +54,7 @@ class ChangePasswordPage extends GetView<ProfileController> {
                         // Handles Form Validation for First Name
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(),
-                          FormBuilderValidators.minLength(3)
+                          FormBuilderValidators.minLength(6, errorText: 'Password must be at least 6 characters')
                         ]),
                         decoration:
                             InputDecoration(labelText: 'New Password'.tr),
@@ -68,12 +71,13 @@ class ChangePasswordPage extends GetView<ProfileController> {
                         padding: EdgeInsets.fromLTRB(40, 40, 40, 0),
                         child: FormBuilderTextField(
                           // Handles Form Validation for First Name
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(),
-                            FormBuilderValidators.equal(
-                                controller.newPassword.value),
-                            FormBuilderValidators.minLength(3)
-                          ]),
+                            validator: FormBuilderValidators.compose([
+                              FormBuilderValidators.required(),
+                              FormBuilderValidators.minLength(6, errorText: 'Password must be at least 6 characters'),
+                              // FormBuilderValidators.equal(controller.newPassword.value, errorText: 'Passwords do not match')
+                            ]),
+
+
                           decoration: InputDecoration(
                               labelText: 'Confirm New Password'.tr),
                           name: 'confirmNewPassword',
@@ -103,7 +107,7 @@ class ChangePasswordPage extends GetView<ProfileController> {
                                   _formKey
                                       .currentState!.value['currentPassword'],
                                   _formKey.currentState!
-                                      .value['confirmNewPassword']);
+                                      .value['confirmNewPassword'],controller.newPassword.value);
                             } else {
                               print('Validation Failed');
                             }
@@ -111,7 +115,7 @@ class ChangePasswordPage extends GetView<ProfileController> {
                           text: 'Save'),
                     )
                   ],
-                )),
+                ),
           ),
         ));
   }

@@ -33,6 +33,9 @@ abstract class Routes {
   static const TERM_AND_CONDITION = _Paths.TERM_AND_CONDITION;
   static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
   static const BILLING = _Paths.BILLING;
+  static const EDITBILLING = _Paths.EDITBILLING;
+  static const DOCTOTREVIEW = _Paths.DOCTOTREVIEW;
+  static const TRANSACTION_SUCCESS = _Paths.TRANSACTION_SUCCESS;
 }
 
 abstract class _Paths {
@@ -63,5 +66,9 @@ abstract class _Paths {
   static const TERM_AND_CONDITION = '/term-and-condition';
   static const PRIVACY_POLICY = '/privacy-policy';
   static const BILLING = '/billingdetails';
+  static const EDITBILLING = '/editbillingdetails';
+  static const DOCTOTREVIEW = '/doctorreview';
+  static const TRANSACTION_SUCCESS = '/transaction-success';
+
 
 }

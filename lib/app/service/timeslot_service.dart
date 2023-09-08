@@ -23,6 +23,13 @@ class TimeSlotService {
         return timeSlot;
       }).toList();
 
+      //listTimeslot.sort((a, b) => (b.timeSlot ?? DateTime(0)).compareTo(a.timeSlot ?? DateTime(0)));
+
+      listTimeslot.sort((a, b) => b.timeSlot!.compareTo(a.timeSlot!));
+
+
+
+
       return listTimeslot;
     } catch (e) {
       return Future.error(e.toString());

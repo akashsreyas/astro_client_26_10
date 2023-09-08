@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:hallo_doctor_client/app/modules/profile/views/pages/change_password.dart';
+
 import 'package:hallo_doctor_client/app/modules/profile/views/widgets/header_curve_widget.dart';
 import 'package:hallo_doctor_client/app/modules/profile/views/widgets/profile_button.dart';
 import 'package:hallo_doctor_client/app/routes/app_pages.dart';
@@ -64,7 +66,7 @@ class ProfileView extends GetView<ProfileController> {
                       icon: Icons.password,
                       text: 'Change Password'.tr,
                       onTap: () {
-                        controller.toChangePassword();
+               controller.toChangePassword();
                       },
                     ),
                     ProfileButton(
@@ -75,7 +77,7 @@ class ProfileView extends GetView<ProfileController> {
                       },
                     ),
                     ProfileButton(
-                      icon:  Icons.person,
+                      icon:  Icons.file_copy,
                       text: 'Invoice'.tr,
                       onTap: () {
                         controller.toInvoice();
